@@ -37,7 +37,7 @@ internal class RoleClaimService : IRoleClaimService
               .Include(x => x.Role)
               .FirstOrDefaultAsync(x => x.Id == id);
         if (existingRoleClaim == null)
-            throw new ApiException(_localizer["Role Claim does not exist."]);
+            throw new NotFoundException(_localizer["Role Claim does not exist."]);
 
         _db.RoleClaims.Remove(existingRoleClaim);
         await _db.SaveChangesAsync(_currentUserService.UserId);

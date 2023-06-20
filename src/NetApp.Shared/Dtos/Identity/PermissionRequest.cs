@@ -6,5 +6,5 @@ public class PermissionRequest
 {
     [Required]
     public string? RoleId { get; set; }
-    public List<RoleClaimRequest> RoleClaims { get; set; } = new();
+    public List<PermissionBase> Permissions { get; set; } = new();
 }

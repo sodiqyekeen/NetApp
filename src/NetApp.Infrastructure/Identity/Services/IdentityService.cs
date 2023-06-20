@@ -28,9 +28,10 @@ internal class IdentityService : IIdentityService
     private readonly RoleManager<NetAppRole> _roleManager;
     private readonly IEmailService _emailService;
     private readonly IRepositoryProvider _repositoryProvider;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly ISessionService _currentUserService;
     private readonly IStringLocalizer<NetAppLocalizer> _localizer;
     private readonly IDateTimeService _dateTimeService;
+    private readonly ILogger<IdentityService> _logger;
     private readonly JwtSettings _jwtSettings;
 
     public IdentityService(UserManager<NetAppUser> userManager,
@@ -39,30 +40,28 @@ internal class IdentityService : IIdentityService
         IOptions<JwtSettings> jwtSettings,
         IEmailService emailService,
         IRepositoryProvider repositoryProvider,
-        ICurrentUserService currentUserService,
+        ISessionService currentUserService,
         IStringLocalizer<NetAppLocalizer> localizer,
-        IDateTimeService dateTimeService)
+        IDateTimeService dateTimeService,
+        ILogger<IdentityService> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _roleManager=roleManager;
+        _roleManager = roleManager;
         _emailService = emailService;
         _repositoryProvider = repositoryProvider;
-        _currentUserService=currentUserService;
-        _localizer=localizer;
-        _dateTimeService=dateTimeService;
+        _currentUserService = currentUserService;
+        _localizer = localizer;
+        _dateTimeService = dateTimeService;
+        _logger = logger;
         _jwtSettings = jwtSettings.Value;
     }
 
     public async Task<IResponse<string>> ConfirmEmailAsync(string userId, string code)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-            throw new ApiException(_localizer["Invalid confirmation token."]);
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new ApiException(_localizer["Invalid confirmation token."]);
         code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-        var authToken = await _repositoryProvider.AuthenticationTokenRepository.GetTokenByValueAsync(code);
-        if (authToken == null)
-            throw new ApiException(_localizer["Invalid confirmation token, link is broken."]);
+        var authToken = await _repositoryProvider.AuthenticationTokenRepository.GetTokenByValueAsync(code) ?? throw new ApiException(_localizer["Invalid confirmation token, link is broken."]);
         if (authToken.Expired)
         {
             _repositoryProvider.AuthenticationTokenRepository.DeleteToken(authToken);
@@ -79,14 +78,15 @@ internal class IdentityService : IIdentityService
         _repositoryProvider.AuthenticationTokenRepository.DeleteToken(authToken);
         await _repositoryProvider.SaveChangesAsync();
         if (!result.Succeeded)
+        {
+            _logger.LogError($"Error confirming email for user with ID '{user.Id}': {string.Join(", ", result.Errors)}");
             throw new ApiException(_localizer["An error occurred."]);
+        }
     }
 
     public async Task<IResponse> DeleteUserAsync(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-            throw new NotFoundException(_localizer["User not found."]);
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException(_localizer["User not found."]);
         user.Active = false;
         await _userManager.UpdateAsync(user);
         return Response.Success(_localizer["User deleted successfully."]);
@@ -95,7 +95,11 @@ internal class IdentityService : IIdentityService
     public async Task ForgotPasswordAsync(ForgotPasswordRequest request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email!);
-        if (user == null) return;
+        if (user == null)
+        {
+            _logger.LogWarning("Forgot Password: User Not Found. Email address: {Email}", request.Email);
+            return;
+        }
         if (!user.EmailConfirmed)
             throw new ApiException($"Account not confirmed for '{request.Email}'.");
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -116,13 +120,11 @@ internal class IdentityService : IIdentityService
         await _repositoryProvider.SaveChangesAsync();
     }
 
-    public async Task<IResponse<AuthenticationResponse>> GetRefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
+    public async Task<IResponse<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
     {
         var userPrincipal = GetPrincipalFromExpiredToken(request.Token);
         var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
-        var user = await _userManager.FindByEmailAsync(userEmail!);
-        if (user == null)
-            throw new NotFoundException("User Not Found.");
+        var user = await _userManager.FindByEmailAsync(userEmail!) ?? throw new NotFoundException("User Not Found.");
         if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             throw new ApiException("Invalid Client Token.");
 
@@ -133,26 +135,25 @@ internal class IdentityService : IIdentityService
 
     public async Task<IResponse<UserRolesResponse>> GetRolesAsync(string userId)
     {
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException(_localizer["User not found."]);
         var viewModel = new List<UserRoleModel>();
-        var user = await _userManager.FindByIdAsync(userId);
-        var roles = await _roleManager.Roles.ToListAsync();
-        roles = roles.Where(x => x.Name != ApplicationConstants.Role.SuperAdmin).ToList();
-        foreach (var role in roles)
+        var userRoleNames = await _userManager.GetRolesAsync(user);
+        var userRoles = await _roleManager.Roles.Where(r => userRoleNames.Contains(r.Name!)).ToListAsync();
+        foreach (var role in userRoles)
         {
-            var selected = await _userManager.IsInRoleAsync(user!, role.Name!);
-            viewModel.Add(new UserRoleModel(role.Name!, role.Description!, selected));
+            viewModel.Add(new UserRoleModel(role.Id, role.Name!, role.Description!));
         }
-        return Response<UserRolesResponse>.Success(new UserRolesResponse(viewModel));
+        return Response<UserRolesResponse>.Success(new UserRolesResponse(user.Id, viewModel));
     }
 
     public async Task<IResponse<IEnumerable<User>>> GetUsersAsync()
     {
-        var superAdmin = (await _userManager.GetUsersInRoleAsync(ApplicationConstants.Role.SuperAdmin)).Select(u => u.Id).FirstOrDefault();
+        var superAdmin = (await _userManager.GetUsersInRoleAsync(DomainConstants.Role.SuperAdmin)).Select(u => u.Id).FirstOrDefault();
         var users = new List<User>();
         foreach (var user in _userManager.Users.Where(u => u.Id != superAdmin))
         {
             var userRoles = await _userManager.GetRolesAsync(user);
-            users.Add(new User(user.Id, user.UserName!, user.Email!, userRoles, user.Active));
+            users.Add(new User(user.Id, user.UserName!, user.Email!, userRoles.ToList(), user.Active));
         }
 
         return Response<IEnumerable<User>>.Success(users);
@@ -160,14 +161,11 @@ internal class IdentityService : IIdentityService
 
     public async Task<IResponse<AuthenticationResponse>> LoginAsync(AuthenticationRequest request, string ipAddress)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user == null)
-            throw new ApiException(_localizer["Invalid credentials."]);
-
+        var user = await _userManager.FindByEmailAsync(request.Email) ?? throw new ApiException(_localizer["Invalid credentials."]);
         if (!user.Active)
             throw new ApiException(_localizer["User account is disabled."]);
 
-        var result = await _signInManager.PasswordSignInAsync(user, request.Password, false, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(user, request.Password!, false, lockoutOnFailure: false);
 
         if (!result.Succeeded)
             throw new ApiException(_localizer["Invalid credentials."]);
@@ -195,7 +193,7 @@ internal class IdentityService : IIdentityService
         var result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded)
             throw new ApiException($"{result.Errors.First().Description}");
-        await _userManager.AddToRoleAsync(user, ApplicationConstants.Role.Basic);
+        await _userManager.AddToRoleAsync(user, DomainConstants.Role.Basic);
         await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.NameIdentifier, user.Id));
         await _userManager.AddClaimAsync(user, new Claim("username", user.UserName!));
         var verificationLink = await GenerateVerificationEmailLink(user, origin);
@@ -215,11 +213,7 @@ internal class IdentityService : IIdentityService
 
     public async Task ResendConfirmationMailAsync(ConfirmationMailRequest request, string ipAddress)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId);
-
-        if (user == null)
-            throw new NotFoundException(_localizer["User not found."]);
-
+        var user = await _userManager.FindByIdAsync(request.UserId) ?? throw new NotFoundException(_localizer["User not found."]);
         var verificationLink = await GenerateVerificationEmailLink(user, ipAddress);
         string mailBody = $"<p>Please click this <a href=\"{verificationLink}\" target=\"_blank\" >link</a> to confirm your account.</p>";
         await _emailService.SendAsync(new EmailRequest(user.Email!, _localizer["Confirm Registration"], mailBody));
@@ -229,14 +223,10 @@ internal class IdentityService : IIdentityService
     {
         if (!string.Equals(request.Password, request.ConfirmPassword))
             throw new ApiException(_localizer["The passwords entered does not match."]);
-        var user = await _userManager.FindByEmailAsync(request.Email!);
-        if (user == null)
-            throw new ApiException(_localizer["Invalid credentials."]);
+        var user = await _userManager.FindByEmailAsync(request.Email!) ?? throw new ApiException(_localizer["Invalid credentials."]);
         if (!user.Active)
             throw new ApiException(_localizer["User account is disabled."]);
-        var authToken = await _repositoryProvider.AuthenticationTokenRepository.GetTokenByKeyAsync(request.Token!);
-        if (authToken == null)
-            throw new ApiException(_localizer["Token is either incorrect or expired."]);
+        var authToken = await _repositoryProvider.AuthenticationTokenRepository.GetTokenByKeyAsync(request.Token!) ?? throw new ApiException(_localizer["Token is either incorrect or expired."]);
         if (authToken.Expired || authToken.CreatedBy != request.Email)
             throw new ApiException(_localizer["Token is either incorrect or expired."]);
 
@@ -252,9 +242,7 @@ internal class IdentityService : IIdentityService
     {
         if (!string.Equals(request.NewPassword, request.ConfirmPassword))
             throw new ApiException(_localizer["The passwords entered does not match."]);
-        var user = await _userManager.FindByEmailAsync(_currentUserService.Email);
-        if (user == null)
-            throw new ApiException(_localizer["Something went wrong! Please login and try again."]);
+        var user = await _userManager.FindByEmailAsync(_currentUserService.Email) ?? throw new ApiException(_localizer["Something went wrong! Please login and try again."]);
         await HandlePasswordUpdateAsync(request, user);
         return Response.Success(_localizer["Password reset successfully."]);
     }
@@ -263,14 +251,15 @@ internal class IdentityService : IIdentityService
     {
         var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword!, request.NewPassword!);
         if (!result.Succeeded)
-            throw new ApiException(result.Errors.First().Description ?? _localizer["Error occured while changing the password."]);
+        {
+            _logger.LogError($"Error updating password for user with ID '{user.Id}': {string.Join(", ", result.Errors)}");
+            throw new ApiException(_localizer["Error occured while changing the password."]);
+        }
     }
 
     public async Task<IResponse> UpdateUserAsync(string id, EditUserRequest request)
     {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null)
-            throw new NotFoundException("User not found.");
+        var user = await _userManager.FindByIdAsync(id) ?? throw new NotFoundException("User not found.");
         user.Active = request.Active;
         await _userManager.UpdateAsync(user);
         return Response.Success(_localizer["User updated successfully."]);
@@ -278,35 +267,36 @@ internal class IdentityService : IIdentityService
 
     public async Task<IResponse> UpdateUserRoleAsync(string id, UpdateUserRoleRequest request)
     {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null)
-            throw new NotFoundException(_localizer["User not found."]);
-
+        var user = await _userManager.FindByIdAsync(id) ?? throw new NotFoundException(_localizer["User not found."]);
         if (id != request.UserId)
             throw new ApiException(_localizer["Invalid user id"]);
 
         if (user.Id == _currentUserService.UserId)
             throw new ApiException(_localizer["Operation not allowed."]);
 
-        if (await _userManager.IsInRoleAsync(user, ApplicationConstants.Role.SuperAdmin))
+        if (await _userManager.IsInRoleAsync(user, DomainConstants.Role.SuperAdmin))
             throw new ApiException(_localizer["Operation not allowed."]);
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var existingRoles = await _userManager.GetRolesAsync(user);
 
         //if (!_currentUserService.IsAdmin && roles.Any(x => x == ApplicationConstants.Role.Admin))
         //    throw new ApiException("Not allowed to add or delete Administrator Role if you have not this role.");
 
-        await HandleUserRoleUpdateAsync(request, user, roles);
+        await HandleUserRoleUpdateAsync(user, existingRoles, request.Roles);
 
         return Response.Success("User role updated successfully.");
     }
 
-    private async Task HandleUserRoleUpdateAsync(UpdateUserRoleRequest request, NetAppUser user, IList<string> roles)
+
+    private async Task HandleUserRoleUpdateAsync(NetAppUser user, IEnumerable<string> existingRoles, IEnumerable<string> newRoles)
     {
-        await _userManager.RemoveFromRolesAsync(user, roles);
-        var result = await _userManager.AddToRoleAsync(user, request.SelectedRole.RoleName);
+        await _userManager.RemoveFromRolesAsync(user, existingRoles);
+        var result = await _userManager.AddToRolesAsync(user, newRoles);
         if (!result.Succeeded)
-            throw new ApiException(string.Join("|", result.Errors.Select(e => e.Description)));
+        {
+            _logger.LogError($"Error updating user role for user with ID '{user.Id}': {string.Join(", ", result.Errors)}");
+            throw new ApiException(_localizer["Error occured while updating the user role."]);
+        }
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
@@ -318,13 +308,13 @@ internal class IdentityService : IIdentityService
             ValidateAudience = true,
             ClockSkew = TimeSpan.Zero,
             ValidIssuer = _jwtSettings.Issuer,
-            ValidAudience =_jwtSettings.Audience,
+            ValidAudience = _jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key))
         };
         var tokenHandler = new JwtSecurityTokenHandler();
         var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
         return IsValidToken(securityToken)
-            ? throw new SecurityTokenException("Invalid token")
+            ? throw new SecurityTokenException("Access token is invalid.")
             : principal;
     }
 
@@ -333,7 +323,7 @@ internal class IdentityService : IIdentityService
 
     private void SetRefreshToken(NetAppUser user)
     {
-        user.RefreshToken= StringExtensions.RandomTokenString();
+        user.RefreshToken = StringExtensions.RandomTokenString();
         user.RefreshTokenExpiryTime = _dateTimeService.Now.AddDays(1);
     }
 

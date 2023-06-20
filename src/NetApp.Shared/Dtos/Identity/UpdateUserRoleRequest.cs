@@ -8,5 +8,6 @@ public class UpdateUserRoleRequest
     public string? UserId { get; set; }
 
     [Required]
-    public UserRoleModel SelectedRole { get; set; } = null!;
+    public List<string> Roles { get; set; } = new();
+    // public UserRoleModel SelectedRole { get; set; } = null!;
 }

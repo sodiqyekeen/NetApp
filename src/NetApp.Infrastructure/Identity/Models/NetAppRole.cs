@@ -5,7 +5,7 @@ namespace NetApp.Infrastructure.Identity.Models;
 
 public class NetAppRole : IdentityRole, IAuditableEntity<string>
 {
-    public string? Description { get; set; }
+    public string Description { get; set; } = null!;
     public string CreatedBy { get; set; } = null!;
     public DateTime CreatedOn { get; set; }
     public string? LastModifiedBy { get; set; }
@@ -17,7 +17,7 @@ public class NetAppRole : IdentityRole, IAuditableEntity<string>
         RoleClaims = new HashSet<NetAppRoleClaim>();
     }
 
-    public NetAppRole(string roleName, string? roleDescription = null) : base(roleName)
+    public NetAppRole(string roleName, string roleDescription) : base(roleName)
     {
         RoleClaims = new HashSet<NetAppRoleClaim>();
         Description = roleDescription;

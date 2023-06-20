@@ -1,12 +1,12 @@
 ﻿using NetApp.Application.Dtos.Identity;
-using NetApp.Domain.Models;
+using NetApp.Models;
 
 namespace NetApp.Application.Interfaces.Identity;
 
 public interface IIdentityService
 {
     Task<IResponse<AuthenticationResponse>> LoginAsync(AuthenticationRequest request, string ipAddress);
-    Task<IResponse<AuthenticationResponse>> GetRefreshTokenAsync(RefreshTokenRequest request, string ipAddress);
+    Task<IResponse<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress);
     Task<IResponse<string>> RegisterAsync(RegisterRequest request, string origin);
     Task<IResponse> UpdateUserAsync(string id, EditUserRequest request);
     Task<IResponse<IEnumerable<User>>> GetUsersAsync();

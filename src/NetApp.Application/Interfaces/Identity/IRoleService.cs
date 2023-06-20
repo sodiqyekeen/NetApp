@@ -1,5 +1,4 @@
 ﻿using NetApp.Application.Dtos.Identity;
-using NetApp.Domain.Models;
 
 namespace NetApp.Application.Interfaces.Identity;
 
@@ -11,5 +10,4 @@ public interface IRoleService
     Task<IResponse<RoleResponse>> GetByIdAsync(string id);
     Task<IResponse<string>> SaveAsync(RoleRequest request);
     Task<IResponse> UpdatePermissionsAsync(PermissionRequest request);
-    Task<int> GetCountAsync();
 }

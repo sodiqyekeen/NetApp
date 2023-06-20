@@ -1,4 +1,4 @@
-namespace NetApp.Domain.Models;
+namespace NetApp.Models;
 
 public interface IResponse
 {
@@ -15,7 +15,7 @@ public interface IResponse<T> : IResponse
 public class Response<T> : IResponse<T>
 {
     public bool Succeeded { get; set; }
-    public string Message { get; set; }
+    public string Message { get; set; }=null!;
     public T? Data { get; set; }
 
     public static IResponse<T> Fail(string message) => new Response<T> { Succeeded = false, Message = message };
@@ -26,7 +26,7 @@ public class Response<T> : IResponse<T>
 public class Response : IResponse
 {
     public bool Succeeded { get; set; }
-    public string Message { get; set; }
+    public string Message { get; set; } =null!;
     public static IResponse Success(string message = "") => new Response { Succeeded = true, Message = message };
     public static IResponse Fail(string message) => new Response { Succeeded = false, Message = message };
 

@@ -2,14 +2,14 @@
 
 public record AuthenticationResponse(string JWToken, string RefreshToken);
 
-public record UserRolesResponse(List<UserRoleModel> UserRoles);
+public record UserRolesResponse(string UserId, List<UserRoleModel> Roles);
 
-public record UserRoleModel(string RoleName, string RoleDescription, bool Selected);
+public record UserRoleModel(string RoleId, string RoleName, string RoleDescription);
 
 public record User(
      string Id,
      string UserName,
      string Email,
-     IList<string> Roles,
+     List<string> Roles,
      bool Active
 );

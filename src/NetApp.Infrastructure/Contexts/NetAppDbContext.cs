@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NetApp.Application.Common;
-using NetApp.Application.Interfaces;
 using NetApp.Domain.Common;
 using NetApp.Domain.Repositories;
 

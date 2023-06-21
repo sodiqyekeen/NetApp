@@ -1,4 +1,4 @@
-﻿namespace NetApp.Shared.Extensions;
+﻿namespace NetApp.Extensions;
 
 public static class CollectionExtensions
 {

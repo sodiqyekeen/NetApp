@@ -1,4 +1,4 @@
-namespace NetApp.Application.Dtos.Common;
+namespace NetApp.Dtos;
 
 public record EmailRequest(
         string To,

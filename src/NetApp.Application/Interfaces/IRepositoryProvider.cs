@@ -1,6 +1,6 @@
 using NetApp.Domain.Repositories;
 
-namespace NetApp.Application.Interfaces;
+namespace NetApp.Application.Services;
 
 public interface IRepositoryProvider
 {

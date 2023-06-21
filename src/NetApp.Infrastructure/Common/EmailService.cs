@@ -4,11 +4,9 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using NetApp.Application.Common;
 using NetApp.Domain.Models;
-using NetApp.Application.Dtos.Common;
 
-namespace NetApp.Infrastructure.Common;
+namespace NetApp.Infrastructure.Services;
 
 public class EmailService : IEmailService
 {

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using NetApp.Application.Interfaces;
 
 namespace NetApp.Api.Services
 {

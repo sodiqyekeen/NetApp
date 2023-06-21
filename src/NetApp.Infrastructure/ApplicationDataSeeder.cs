@@ -1,14 +1,10 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NetApp.Application.Interfaces;
-using NetApp.Domain.Constants;
 using NetApp.Infrastructure.Contexts;
 using NetApp.Infrastructure.Identity;
-using NetApp.Infrastructure.Identity.Models;
-using NetApp.Shared.Constants;
 
-namespace NetApp.Application;
+namespace NetApp.Infrastructure.Services;
 
  public class ApplicationDataSeeder : IDatabaseSeeder
     {
@@ -32,7 +28,7 @@ namespace NetApp.Application;
             }
 
             foreach (var permission in PermissionHelper.GetAllPermissions().SelectMany(x => x.Permissions).Select(p => p.Value))
-                await _roleManager.AddClaimAsync(superAdminRole!, new Claim(ApplicationConstants.CustomClaimTypes.Permission, permission));
+                await _roleManager.AddClaimAsync(superAdminRole!, new Claim(SharedConstants.CustomClaimTypes.Permission, permission));
 
         }
 

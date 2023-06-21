@@ -2,8 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
-using NetApp.Application.Dtos.Identity;
-using NetApp.Shared.Extensions;
+using NetApp.Extensions;
 using NetApp.UI.Infrastructure.Extensions;
 
 namespace NetApp.UI.Infrastructure;

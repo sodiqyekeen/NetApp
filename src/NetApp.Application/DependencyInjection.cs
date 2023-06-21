@@ -1,5 +1,6 @@
-﻿
-global using NetApp.Models;
+﻿global using NetApp.Models;
+global using NetApp.Dtos;
+global using NetApp.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -4,16 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using NetApp.Application.Common;
-using NetApp.Application.Dtos.Common;
-using NetApp.Application.Dtos.Identity;
-using NetApp.Application.Interfaces;
-using NetApp.Application.Interfaces.Identity;
 using NetApp.Domain.Constants;
 using NetApp.Domain.Entities;
 using NetApp.Domain.Exceptions;
 using NetApp.Domain.Models;
-using NetApp.Infrastructure.Identity.Models;
 using NetApp.Shared;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -146,17 +140,19 @@ internal class IdentityService : IIdentityService
         return Response<UserRolesResponse>.Success(new UserRolesResponse(user.Id, viewModel));
     }
 
-    public async Task<IResponse<IEnumerable<User>>> GetUsersAsync()
+    public async Task<IResponse<PaginatedResponse<User>>> GetUsersAsync()
     {
         var superAdmin = (await _userManager.GetUsersInRoleAsync(DomainConstants.Role.SuperAdmin)).Select(u => u.Id).FirstOrDefault();
         var users = new List<User>();
+        var usersQuery = _userManager.Users.Where(u => u.Id != superAdmin).AsQueryable();
+        // var paginatedList = await Paginate<NetAppUser>.CreateAsync(usersQuery, 1, 10);
         foreach (var user in _userManager.Users.Where(u => u.Id != superAdmin))
         {
             var userRoles = await _userManager.GetRolesAsync(user);
             users.Add(new User(user.Id, user.UserName!, user.Email!, userRoles.ToList(), user.Active));
         }
 
-        return Response<IEnumerable<User>>.Success(users);
+        return Response<PaginatedResponse<User>>.Success(new PaginatedResponse<User>());
     }
 
     public async Task<IResponse<AuthenticationResponse>> LoginAsync(AuthenticationRequest request, string ipAddress)

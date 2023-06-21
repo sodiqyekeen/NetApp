@@ -1,4 +1,4 @@
-namespace NetApp.Application.Common;
+namespace NetApp.Application.Services;
 
 public interface IDateTimeService
 {

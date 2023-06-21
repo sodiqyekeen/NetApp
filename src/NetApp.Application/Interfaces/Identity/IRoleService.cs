@@ -1,6 +1,4 @@
-﻿using NetApp.Application.Dtos.Identity;
-
-namespace NetApp.Application.Interfaces.Identity;
+﻿namespace NetApp.Application.Services;
 
 public interface IRoleService
 {

@@ -1,15 +1,11 @@
-﻿using NetApp.Application.Dtos.Identity;
-using NetApp.Models;
-
-namespace NetApp.Application.Interfaces.Identity;
-
+﻿namespace NetApp.Application.Services;
 public interface IIdentityService
 {
     Task<IResponse<AuthenticationResponse>> LoginAsync(AuthenticationRequest request, string ipAddress);
     Task<IResponse<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress);
     Task<IResponse<string>> RegisterAsync(RegisterRequest request, string origin);
     Task<IResponse> UpdateUserAsync(string id, EditUserRequest request);
-    Task<IResponse<IEnumerable<User>>> GetUsersAsync();
+    Task<IResponse<PaginatedResponse<User>>> GetUsersAsync();
     Task<IResponse<string>> ConfirmEmailAsync(string userId, string code);
     Task ForgotPasswordAsync(ForgotPasswordRequest request);
     Task<IResponse> ResetPasswordAsync(ResetPasswordRequest request);

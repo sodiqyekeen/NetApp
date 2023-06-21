@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using NetApp.Application.Dtos.Identity;
 
 namespace NetApp.UI.Infrastructure.Services;
 public interface IAuthenticationService

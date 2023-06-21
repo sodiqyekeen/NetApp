@@ -1,4 +1,4 @@
-﻿namespace NetApp.Application.Dtos.Identity;
+﻿namespace NetApp.Dtos;
 
 public record AuthenticationResponse(string JWToken, string RefreshToken);
 

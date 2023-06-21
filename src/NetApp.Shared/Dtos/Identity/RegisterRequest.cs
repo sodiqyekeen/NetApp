@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NetApp.Application.Dtos.Identity;
+namespace NetApp.Dtos;
 
 public class RegisterRequest
 {

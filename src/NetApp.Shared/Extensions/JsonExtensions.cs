@@ -1,5 +1,5 @@
 using System.Text.Json;
-namespace NetApp.Shared.Extensions;
+namespace NetApp.Extensions;
 public static class JsonExtentions
 {
     private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };

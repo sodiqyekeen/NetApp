@@ -1,5 +1,5 @@
-﻿namespace NetApp.Application;
-public static class ApplicationConstants
+﻿namespace NetApp.Constants;
+public static class SharedConstants
 {
     public static class SignalR
     {

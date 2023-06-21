@@ -33,7 +33,7 @@ public static class AuthenticationStateExtensions
 
     public static bool Authorize(this ClaimsPrincipal currentUser, string permission)
     {
-        var permissions = currentUser.FindAll(c => c.Type == Application.ApplicationConstants.CustomClaimTypes.Permission);
+        var permissions = currentUser.FindAll(c => c.Type == SharedConstants.CustomClaimTypes.Permission);
         return permissions != null && permissions.Any(r => r.Value.Contains(permission));
     }
 }

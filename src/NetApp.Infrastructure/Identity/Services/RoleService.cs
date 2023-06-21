@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Localization;
-using NetApp.Application.Dtos.Identity;
-using NetApp.Application.Interfaces.Identity;
 using NetApp.Domain.Exceptions;
 using NetApp.Domain.Models;
 using NetApp.Domain.Repositories;
@@ -11,9 +9,7 @@ using NetApp.Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NetApp.Domain.Constants;
-using NetApp.Shared.Constants;
 using System.Security.Claims;
-using NetApp.Application.Interfaces;
 using NetApp.Application;
 
 namespace NetApp.Infrastructure.Identity.Services;
@@ -136,7 +132,7 @@ internal class RoleService : IRoleService
         //add new permissions
         foreach (var permission in newPermissions)
         {
-            await _roleManager.AddClaimAsync(role, new Claim(ApplicationConstants.CustomClaimTypes.Permission, permission));
+            await _roleManager.AddClaimAsync(role, new Claim(SharedConstants.CustomClaimTypes.Permission, permission));
         }
         return Response.Success(_localizer["Permissions updated successfully."]);
     }

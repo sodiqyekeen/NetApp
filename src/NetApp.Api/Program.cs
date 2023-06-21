@@ -1,8 +1,10 @@
 global using NetApp.Models;
+global using NetApp.Dtos;
+global using NetApp.Application.Services;
 using NetApp.Infrastructure;
 using NetApp.Application;
+
 using NetApp.Api.Endpoints;
-using NetApp.Application.Interfaces;
 using NetApp.Api.Services;
 using NetApp.Api;
 

@@ -1,4 +1,4 @@
-﻿namespace NetApp.Application.Dtos.Identity;
+﻿namespace NetApp.Dtos;
 
 public class RoleClaimResponse
 {

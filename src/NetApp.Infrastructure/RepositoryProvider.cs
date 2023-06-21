@@ -1,4 +1,3 @@
-using NetApp.Application.Interfaces;
 using NetApp.Domain.Repositories;
 
 namespace NetApp.Infrastructure;

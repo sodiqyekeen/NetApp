@@ -1,6 +1,4 @@
-﻿using NetApp.Application.Dtos.Identity;
-
-namespace NetApp.UI.Infrastructure;
+﻿namespace NetApp.UI.Infrastructure;
 public interface IIdentityService
 {
     Task<PaginatedResponse<User>> GetUsersAsync(TableState state, string? searchString);

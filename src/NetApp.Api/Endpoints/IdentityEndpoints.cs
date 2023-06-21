@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetApp.Application.Dtos.Identity;
-using NetApp.Application.Interfaces.Identity;
 
 namespace NetApp.Api.Endpoints;
 internal static class IdentityEndpoints

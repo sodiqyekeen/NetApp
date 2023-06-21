@@ -1,6 +1,4 @@
-using NetApp.Application.Dtos.Common;
-
-namespace NetApp.Application.Common;
+namespace NetApp.Application.Services;
 public interface IEmailService
 {
     Task SendAsync(EmailRequest request);

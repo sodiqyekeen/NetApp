@@ -9,7 +9,7 @@ public static class HubExtensions
     {
         if (hubConnection == null)
         {
-            var url = configuration["ApiUrl"] + Application.ApplicationConstants.SignalR.HubUrl;
+            var url = configuration["ApiUrl"] + SharedConstants.SignalR.HubUrl;
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(new Uri(url), option => option.AccessTokenProvider = async () => await storage.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken))
                 .WithAutomaticReconnect()

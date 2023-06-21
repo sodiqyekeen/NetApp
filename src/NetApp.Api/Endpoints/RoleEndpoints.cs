@@ -1,7 +1,4 @@
-﻿using NetApp.Application.Dtos.Identity;
-using NetApp.Application.Interfaces.Identity;
-
-namespace NetApp.Api;
+﻿namespace NetApp.Api;
 internal static class RoleEndpoints
 {
     public static RouteGroupBuilder MapRoleEndpoints(this RouteGroupBuilder group)

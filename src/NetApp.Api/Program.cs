@@ -37,8 +37,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ApiErrorHandler>();
 var api = app.MapGroup("/api").WithOpenApi();
-api.MapGroup("identity")
-.MapIdentityEndpoints();
+api.MapIdentityEndpoints();
 
 app.SeedDatabase();
 app.Run();

@@ -9,11 +9,11 @@ public abstract class BaseService
         _httpClient = httpClient;
     }
 
-    public async Task<TResponse> GetAsync<TResponse>(string uri)
+    public async Task<TResponse> GetAsync<TResponse>(string uri, CancellationToken cancellation = default)
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<IResponse<TResponse>>(uri);
+            var response = await _httpClient.GetFromJsonAsync<IResponse<TResponse>>(uri, cancellation);
             return response!.Data!;
         }
         catch (Exception ex)
@@ -39,7 +39,7 @@ public abstract class BaseService
         return (await response.Content.ReadFromJsonAsync<IResponse>())!;
     }
 
-     public async Task<IResponse> PostAsync(string uri)
+    public async Task<IResponse> PostAsync(string uri)
     {
         var response = await _httpClient.PostAsync(uri, null);
         return (await response.Content.ReadFromJsonAsync<IResponse>())!;

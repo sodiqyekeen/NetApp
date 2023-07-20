@@ -1,9 +1,38 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 
-<main>
+@*<MudLayout>
+    <AuthorizeView>
+    <NotAuthorized>
+    <UnauthorizedLayout>
     @Body
-</main>
-
-<MudThemeProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+    </UnauthorizedLayout>
+    </NotAuthorized>
+    <Authorized>
+    <AuthorizedLayout>
+    @Body
+    </AuthorizedLayout>
+    </Authorized>
+    </AuthorizeView>
+</MudLayout>*@
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit" Edge="Edge.End" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" Edge="Edge.End" />
+        <MudIconButton Icon="@Icons.Material.Outlined.LightMode" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer Open="true" Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
+        </MudDrawerHeader>
+        <MainMenu />
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+<MudOverlay Visible="false" LightBackground="true" Absolute="true">
+    <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+</MudOverlay>

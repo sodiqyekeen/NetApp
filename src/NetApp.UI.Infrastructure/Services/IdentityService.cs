@@ -23,14 +23,14 @@ public class IdentityService : BaseService, IIdentityService
         return await PostAsync(Endpoints.Identity.ForgotPassword, request);
     }
 
-    public async Task<IResponse<UserRolesResponse>> GetRolesAsync(string userId)
+    public async Task<IResponse<UserRolesResponse>> GetRolesAsync(string userId, CancellationToken cancellation)
     {
-        return await GetAsync<IResponse<UserRolesResponse>>(Endpoints.Identity.UserRoles(userId));
+        return await GetAsync<IResponse<UserRolesResponse>>(Endpoints.Identity.UserRoles(userId), cancellation);
     }
 
-    public async Task<PaginatedResponse<User>> GetUsersAsync(TableState state, string? searchString)
+    public async Task<PaginatedResponse<User>> GetUsersAsync(TableState state, string? searchString, CancellationToken cancellationToken)
     {
-        var response = await GetAsync<IResponse<PaginatedResponse<User>>>(Endpoints.Identity.Users);
+        var response = await GetAsync<IResponse<PaginatedResponse<User>>>(Endpoints.Identity.Users, cancellationToken);
         return response!.Data!;
     }
 

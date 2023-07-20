@@ -20,6 +20,11 @@ public class ApiErrorHandler
         {
             await _next(context);
         }
+        catch (OperationCanceledException)
+        {
+            context.Response.StatusCode =  (int)HttpStatusCode.Conflict;
+
+        }
         catch (Exception error)
         {
             var response = context.Response;
@@ -42,9 +47,6 @@ public class ApiErrorHandler
                 case ApiException e:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
-                // case RequestValidationException e:
-                //     responseModel.Messages.AddRange(e.Errors);
-                //     break;
                 default:
                     _logger.LogError(error.Message, error);
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;

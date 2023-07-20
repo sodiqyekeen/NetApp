@@ -5,7 +5,7 @@ internal static class IdentityEndpoints
 {
     public static RouteGroupBuilder MapIdentityEndpoints(this RouteGroupBuilder group)
     {
-
+        group= group.MapGroup("identity");
         group.MapPost("/login", async (AuthenticationRequest request, HttpContext context, IIdentityService identityService) =>
              Results.Ok(await identityService.LoginAsync(request, GetIPAddress(context))))
              .Produces<IResponse<AuthenticationResponse>>(StatusCodes.Status200OK);
@@ -14,8 +14,8 @@ internal static class IdentityEndpoints
              Results.Ok(await identityService.RefreshTokenAsync(request, GetIPAddress(context))))
              .Produces<IResponse<AuthenticationResponse>>(StatusCodes.Status200OK);
 
-        group.MapGet("/users", async (IIdentityService identityService) =>
-            Results.Ok(await identityService.GetUsersAsync()))
+        group.MapGet("/users", async (IIdentityService identityService, PagingOptions pagingOptions, CancellationToken cancellationToken) =>
+            Results.Ok(await identityService.GetUsersAsync(pagingOptions,cancellationToken)))
             .RequireAuthorization()
             .Produces<IResponse<IEnumerable<User>>>(StatusCodes.Status200OK);
 
@@ -55,10 +55,10 @@ internal static class IdentityEndpoints
             Results.Ok(await identityService.DeleteUserAsync(userId)))
             .Produces<IResponse>(StatusCodes.Status200OK);
 
-        group.MapGet("users/{userId}/roles", async (string userId, IIdentityService identityService) =>
+        group.MapGet("users/{userId}/roles", async (IIdentityService identityService, string userId, CancellationToken cancellationToken) =>
             Results.Ok(await identityService.GetRolesAsync(userId)))
             .Produces<IResponse<UserRolesResponse>>(StatusCodes.Status200OK);
-        
+
         group.MapPut("users/{userId}/roles", async (UpdateUserRoleRequest request, string userId, IIdentityService identityService) =>
             Results.Ok(await identityService.UpdateUserRoleAsync(userId, request)))
             .Produces<IResponse>(StatusCodes.Status200OK);

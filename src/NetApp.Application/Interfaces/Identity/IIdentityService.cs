@@ -5,7 +5,7 @@ public interface IIdentityService
     Task<IResponse<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress);
     Task<IResponse<string>> RegisterAsync(RegisterRequest request, string origin);
     Task<IResponse> UpdateUserAsync(string id, EditUserRequest request);
-    Task<IResponse<PaginatedResponse<User>>> GetUsersAsync();
+    Task<IResponse<PaginatedResponse<User>>> GetUsersAsync(PagingOptions pagingOptions, CancellationToken cancellationToken);
     Task<IResponse<string>> ConfirmEmailAsync(string userId, string code);
     Task ForgotPasswordAsync(ForgotPasswordRequest request);
     Task<IResponse> ResetPasswordAsync(ResetPasswordRequest request);

@@ -114,13 +114,19 @@ internal class IdentityService : IIdentityService
         await _repositoryProvider.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Refreshes the authentication token for user.
+    /// </summary>
+    /// <param name="request">Request object containing refresh token.</param>
+    /// <param name="ipAddress">String representation of IP address for request.</param>
+    /// <returns>Response object containing the authentication response data.</returns>
     public async Task<IResponse<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
     {
         var userPrincipal = GetPrincipalFromExpiredToken(request.Token);
         var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
-        var user = await _userManager.FindByEmailAsync(userEmail!) ?? throw new NotFoundException("User Not Found.");
+        var user = await _userManager.FindByEmailAsync(userEmail!) ?? throw new NotFoundException(_localizer["User Not Found."]);
         if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-            throw new ApiException("Invalid Client Token.");
+            throw new ApiException(_localizer["Invalid Client Token."]);
 
         SetRefreshToken(user);
         await _userManager.UpdateAsync(user);
@@ -140,19 +146,20 @@ internal class IdentityService : IIdentityService
         return Response<UserRolesResponse>.Success(new UserRolesResponse(user.Id, viewModel));
     }
 
-    public async Task<IResponse<PaginatedResponse<User>>> GetUsersAsync()
+    public async Task<IResponse<PaginatedResponse<User>>> GetUsersAsync(PagingOptions pagingOptions, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var superAdmin = (await _userManager.GetUsersInRoleAsync(DomainConstants.Role.SuperAdmin)).Select(u => u.Id).FirstOrDefault();
         var users = new List<User>();
-        var usersQuery = _userManager.Users.Where(u => u.Id != superAdmin).AsQueryable();
-        // var paginatedList = await Paginate<NetAppUser>.CreateAsync(usersQuery, 1, 10);
-        foreach (var user in _userManager.Users.Where(u => u.Id != superAdmin))
+        var usersQuery = _userManager.Users.AsQueryable();
+        usersQuery = usersQuery.Where(u => u.Id != superAdmin);
+        var paginatedList = await usersQuery.ToPaginatedResponse(pagingOptions.PageIndex, pagingOptions.PageSize);
+        foreach (var user in paginatedList.Data)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
             users.Add(new User(user.Id, user.UserName!, user.Email!, userRoles.ToList(), user.Active));
         }
-
-        return Response<PaginatedResponse<User>>.Success(new PaginatedResponse<User>());
+        return Response<PaginatedResponse<User>>.Success(new PaginatedResponse<User>(users, paginatedList.TotalItems, paginatedList.PageSize, paginatedList.PageNumber));
     }
 
     public async Task<IResponse<AuthenticationResponse>> LoginAsync(AuthenticationRequest request, string ipAddress)

@@ -1,8 +1,24 @@
-﻿namespace NetApp.Models;
-public class PagingOptions//(int PageSize, int PageIndex=1)
+﻿using Microsoft.AspNetCore.Http;
+
+namespace NetApp.Models;
+public class PagingOptions
 {
-    private const int MaxPageSize = 50;
-    private int _pageSize = 10;
-    public int PageIndex { get; set; } = 1;
-    public int PageSize { get => _pageSize; set => _pageSize = value > MaxPageSize ? MaxPageSize : value; }
+    private const string pageIndexKey = "pageIndex";
+    private const string pageSizeKey = "pageSize";
+
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
+
+    public static ValueTask<PagingOptions> BindAsync(HttpContext httpContext)
+    {
+        if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+
+        var result = new PagingOptions();
+        if (!string.IsNullOrWhiteSpace(httpContext.Request.Query[pageIndexKey]) && int.TryParse(httpContext.Request.Query[pageIndexKey], out var parsedPageIndex))
+            result.PageIndex = parsedPageIndex;
+        if (!string.IsNullOrWhiteSpace(httpContext.Request.Query[pageSizeKey]) && int.TryParse(httpContext.Request.Query[pageSizeKey], out var parsedPageSize))
+            result.PageSize = parsedPageSize;
+
+        return ValueTask.FromResult(result);
+    }   
 }

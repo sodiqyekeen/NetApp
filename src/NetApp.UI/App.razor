@@ -1,5 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
+<MudThemeProvider  />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
         <Found Context="routeData">
@@ -16,9 +20,6 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
-<MudThemeProvider Theme="theme" />
-<MudDialogProvider />
-<MudSnackbarProvider />
 
 @code {
 
@@ -136,35 +137,7 @@
     //--kt-warning-active: #f1bc00;
     //--kt-danger-active: #d9214e;
     //--kt-dark-active: #131628;
-    MudTheme theme = new MudTheme
-        {
-            Palette = new PaletteLight
-            {
-                Primary = new MudBlazor.Utilities.MudColor("#009ef7"),
-                Secondary = new MudBlazor.Utilities.MudColor("#E4E6EF"),
-                Success = new MudBlazor.Utilities.MudColor("#50cd89"),
-                Info = new MudBlazor.Utilities.MudColor("#7239ea"),
-                Warning = new MudBlazor.Utilities.MudColor("#ffc700"),
-                Error = new MudBlazor.Utilities.MudColor("#f1416c"),
-                Dark = new MudBlazor.Utilities.MudColor("#181C32"),
-                SuccessLighten = "#e8fff3",
-                PrimaryDarken = "#f1faff",
-                SecondaryLighten="#f5f8fa",
-                InfoLighten="#f8f5ff",
-                WarningLighten="#fff8dd",
-                ErrorLighten="#fff5f8",
-                DarkLighten="#eff2f5",
-                AppbarText= new MudBlazor.Utilities.MudColor("#A1A5B7"),
-                AppbarBackground = new MudBlazor.Utilities.MudColor("#ffffff"),
-                Background = new MudBlazor.Utilities.MudColor("#f5f8fa"),
-                DrawerBackground= new MudBlazor.Utilities.MudColor("#1e1e2d"),
-            },
-            LayoutProperties = new LayoutProperties
-            {
-                DrawerWidthLeft = "140px",
-                AppbarHeight = "65px",
-            }
-        };
+   
 
 //    --kt-header-fixed-bg-color: #ffffff;
 //    --kt-header-fixed-box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);

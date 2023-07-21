@@ -1,0 +1,16 @@
+<NavLink href="@Href" class="nav-item py-2" Match="@Match">
+  <div class="menu-item-content">
+        @if (Icon != null)
+        {
+        <MudIcon Class="nav-icon" Icon="@Icon" Title="Home" />
+        }
+    <span class="label">@Label</span>
+  </div>
+</NavLink>
+
+@code {
+    [Parameter] public string? Href { get; set; }
+    [Parameter]    public string?    Icon    { get; set; }
+    [Parameter] public string Label {get; set;} = null!;
+    [Parameter] public NavLinkMatch Match {get; set;} = NavLinkMatch.Prefix;
+} 

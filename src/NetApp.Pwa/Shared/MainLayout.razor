@@ -1,0 +1,61 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="theme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"  />
+        <MudSpacer />
+         <MudIconButton Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit"  />
+        <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit"  />
+        <MudIconButton Icon="@Icons.Material.Outlined.LightMode" Color="Color.Inherit"  />
+       
+    </MudAppBar>
+    <MudDrawer Open="true" Elevation="1">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">NetApp</MudText>
+        </MudDrawerHeader>
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+
+     MudTheme theme = new MudTheme
+        {
+            Palette = new PaletteLight
+            {
+                Primary = new MudBlazor.Utilities.MudColor("#009ef7"),
+                Secondary = new MudBlazor.Utilities.MudColor("#E4E6EF"),
+                Success = new MudBlazor.Utilities.MudColor("#50cd89"),
+                Info = new MudBlazor.Utilities.MudColor("#7239ea"),
+                Warning = new MudBlazor.Utilities.MudColor("#ffc700"),
+                Error = new MudBlazor.Utilities.MudColor("#f1416c"),
+                Dark = new MudBlazor.Utilities.MudColor("#181C32"),
+                SuccessLighten = "#e8fff3",
+                PrimaryDarken = "#f1faff",
+                SecondaryLighten="#f5f8fa",
+                InfoLighten="#f8f5ff",
+                WarningLighten="#fff8dd",
+                ErrorLighten="#fff5f8",
+                DarkLighten="#eff2f5",
+                AppbarText= new MudBlazor.Utilities.MudColor("#A1A5B7"),
+                AppbarBackground = new MudBlazor.Utilities.MudColor("#ffffff"),
+                Background = new MudBlazor.Utilities.MudColor("#f5f8fa"),
+                DrawerBackground= new MudBlazor.Utilities.MudColor("#1e1e2d"),
+            },
+            LayoutProperties = new LayoutProperties
+            {
+                DrawerWidthLeft = "140px",
+                AppbarHeight = "65px",
+            }
+        };
+}

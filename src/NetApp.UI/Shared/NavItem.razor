@@ -1,15 +1,13 @@
 ﻿<style>
-    /*.aside-menu*/ .menu > .menu-item.here > .menu-link {
+     .menu > .menu-item.here > .menu-link {
         transition: color .2s ease;
         background-color: #1b1b28;
         color: #fff;
     }
-
-    /*.aside-menu*/ .menu > .menu-item > .menu-link {
+     .menu > .menu-item > .menu-link {
         color: #9899ac;
     }
-
-    /*.aside-menu*/ .menu > .menu-item > .menu-link {
+     .menu > .menu-item > .menu-link {
         width: 74px;
         height: 74px;
         margin: 0 auto;
@@ -17,7 +15,6 @@
         display: flex;
         border-radius: .475rem;
     }
-
     .menu-item .menu-link {
         cursor: pointer;
         display: flex;
@@ -32,24 +29,22 @@
     .menu-center {
         justify-content: center;
     }
-
     .menu, .menu-wrapper {
         display: flex;
         padding: 0;
         margin: 0;
         list-style: none;
     }
-
-        /*.aside-menu*/ .menu > .menu-item.here > .menu-link .menu-icon, /*.aside-menu*/ .menu > .menu-item.here > .menu-link .menu-icon .svg-icon, /*.aside-menu*/ .menu > .menu-item.here > .menu-link .menu-icon i {
+         .menu > .menu-item.here > .menu-link .menu-icon,  .menu > .menu-item.here > .menu-link .menu-icon .svg-icon,  .menu > .menu-item.here > .menu-link .menu-icon i {
             color: var(--mud-palette-primary);
         }
 
 
-        /*.aside-menu*/ .menu > .menu-item > .menu-link .menu-icon, /*.aside-menu*/ .menu > .menu-item > .menu-link .menu-icon .svg-icon, /*.aside-menu*/ .menu > .menu-item > .menu-link .menu-icon i {
+         .menu > .menu-item > .menu-link .menu-icon,  .menu > .menu-item > .menu-link .menu-icon .svg-icon,  .menu > .menu-item > .menu-link .menu-icon i {
             color: #3a3a5d;
         }
 
-        /*.aside-menu*/ .menu > .menu-item > .menu-link .menu-icon {
+         .menu > .menu-item > .menu-link .menu-icon {
             justify-content: center;
             width: 0;
             margin-bottom: .5rem;
@@ -68,7 +63,7 @@
         margin-right: .5rem;
     }
 
-    /*.aside-menu*/ */.menu > .menu-item > .menu-link .menu-icon i {
+     .menu > .menu-item > .menu-link .menu-icon i {
         font-size: 22px !important;
     }
 
@@ -76,11 +71,11 @@
         color: var(--mud-palette-primary);
     }
 
-    /*.aside-menu*/ .menu > .menu-item.here > .menu-link .menu-title {
+     .menu > .menu-item.here > .menu-link .menu-title {
         color: #fff;
     }
 
-    /* /*.aside-menu*/ .menu > .menu-item > .menu-link .menu-title {
+      .menu > .menu-item > .menu-link .menu-title {
         color: #9899ac;
     }
 
@@ -96,6 +91,11 @@
         display: flex;
         align-items: center;
         flex-grow: 1;
+    }
+
+    /* center menu-item */
+    .menu-item {
+        flex: 0 0 100%;
     }
 </style>
 <div class="menu">

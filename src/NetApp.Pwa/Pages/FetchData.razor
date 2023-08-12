@@ -1,16 +1,12 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 @using NetApp.Pwa.Shared
-
+@inject IDispatcher Dispatcher
 <PageTitle>Weather forecast</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">Weather forecast</MudText>
 <MudText Class="mb-8">This component demonstrates fetching data from the server.</MudText>
-@if (forecasts == null)
-{
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-}
-else
+@if (forecasts != null)
 {
     <MudTable Items="forecasts" Hover="true" SortLabel="Sort By" Elevation="0">
         <HeaderContent>
@@ -37,7 +33,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        Dispatcher.ToggleLoader(true);
+        await Task.Delay(2000);
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        Dispatcher.ToggleLoader(false);
     }
     public class WeatherForecast
     {

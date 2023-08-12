@@ -12,6 +12,8 @@ using NetApp.Shared.Constants;
 using System.Reflection;
 using static NetApp.Constants.SharedConstants;
 using NetApp.UI.Infrastructure.Services;
+using Fluxor;
+using NetApp.UI.Infrastructure.Store;
 
 namespace NetApp.UI.Infrastructure;
 public static class DependencyInjection
@@ -23,7 +25,17 @@ public static class DependencyInjection
                 .AddLocalization(options => options.ResourcesPath = "Resources")
                 .AddTransient<NetAppAuthStateProvider>()
                 .AddTransient<AuthenticationStateProvider, NetAppAuthStateProvider>()
-                .AddSingleton<IStorageService, LocalStorageService>();
+                .AddScoped<IStorageService, LocalStorageService>()
+                .AddScoped<NetAppStateMiddleware>()
+                .AddFluxor(options =>
+                {
+                    options.ScanAssemblies(typeof(DependencyInjection).Assembly);
+                    options.AddMiddleware<NetAppStateMiddleware>();
+#if DEBUG
+                    options.UseReduxDevTools();
+#endif
+                });
+
         return services;
     }
 

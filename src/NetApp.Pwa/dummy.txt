@@ -1,0 +1,92 @@
+@* <MudNavMenu Class="@Class">
+  <NavItem
+    Label="Home"
+    Icon="@Icons.Material.Outlined.Home"
+    Href="/"
+    Match="NavLinkMatch.All"
+  />
+  <NavItem Label="Counter" Icon="@Icons.Material.Outlined.Add" Href="counter" />
+  <NavItem
+    Label="Fetch"
+    Icon="@Icons.Material.Outlined.List"
+    Href="fetchdata"
+  />
+
+  <NavLink onclick="" class="nav-item py-2" Match="NavLinkMatch.Prefix">
+    <div class="menu-item-content">
+      <MudIcon Class="nav-icon" Icon="@Icons.Material.Outlined.PeopleAlt" />
+      <span class="nav-item-label">User Management</span>
+    </div>
+    <div class="menu-sub menu-sub-dropdown py-4 w-200px w-lg-225px">
+      <!--begin:Menu item-->
+      <div class="menu-item">
+        <!--begin:Menu content-->
+        <div class="menu-content">
+          <span class="menu-section fs-5 fw-bolder ps-1 py-1">Home</span>
+        </div>
+        <!--end:Menu content-->
+      </div>
+      <!--end:Menu item-->
+      <!--begin:Menu item-->
+      <div class="menu-item">
+        <!--begin:Menu link-->
+        <a class="menu-link active" href="index.html">
+          <span class="menu-bullet">
+            <span class="bullet bullet-dot"></span>
+          </span>
+          <span class="menu-title">Default</span>
+        </a>
+        <!--end:Menu link-->
+      </div>
+      <!--end:Menu item-->
+      <!--begin:Menu item-->
+      <div class="menu-item">
+        <!--begin:Menu link-->
+        <a class="menu-link" href="dashboards/ecommerce.html">
+          <span class="menu-bullet">
+            <span class="bullet bullet-dot"></span>
+          </span>
+          <span class="menu-title">eCommerce</span>
+        </a>
+        <!--end:Menu link-->
+      </div>
+      <!--end:Menu item-->
+      <!--begin:Menu item-->
+      <div class="menu-item">
+        <!--begin:Menu link-->
+        <a class="menu-link" href="dashboards/projects.html">
+          <span class="menu-bullet">
+            <span class="bullet bullet-dot"></span>
+          </span>
+          <span class="menu-title">Projects</span>
+        </a>
+        <!--end:Menu link-->
+      </div>
+      <!--end:Menu item-->
+      <!--begin:Menu item-->
+      <div class="menu-item">
+        <!--begin:Menu link-->
+        <a class="menu-link" href="dashboards/online-courses.html">
+          <span class="menu-bullet">
+            <span class="bullet bullet-dot"></span>
+          </span>
+          <span class="menu-title">Online Courses</span>
+        </a>
+        <!--end:Menu link-->
+      </div>
+      <!--end:Menu item-->
+      <!--begin:Menu item-->
+      <div class="menu-item">
+        <!--begin:Menu link-->
+        <a class="menu-link" href="dashboards/marketing.html">
+          <span class="menu-bullet">
+            <span class="bullet bullet-dot"></span>
+          </span>
+          <span class="menu-title">Marketing</span>
+        </a>
+        <!--end:Menu link-->
+      </div>
+      <!--end:Menu item-->
+    </div>
+  </NavLink>
+</MudNavMenu> *@

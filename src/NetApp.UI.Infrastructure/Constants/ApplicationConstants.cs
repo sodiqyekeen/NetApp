@@ -9,6 +9,9 @@ public static class ApplicationConstants
     {
         public const string AuthToken = "athkey";
         public const string RefreshToken = "refkey";
+        public const string AppState = "netappstate";
     }
+
+
 }
 

@@ -1,0 +1,9 @@
+@inherits FluxorComponent
+@inject IState<NetAppState> AppState
+
+<MudOverlay Visible="AppState.Value.IsLoading" LightBackground="!AppState.Value.IsDarkMode" Absolute="true">
+     <div class="loader">
+            <span class="loader-text">loading</span>
+            <span class="load"></span>
+        </div>
+</MudOverlay>

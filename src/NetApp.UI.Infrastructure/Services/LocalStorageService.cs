@@ -31,6 +31,7 @@ internal class LocalStorageService : IStorageService
 
     public async Task SetItemAsync<T>(string key, T value)
     {
+        Console.WriteLine("SetItemAsync: " + key);
         var data = value.ToJson();
         await _jsRuntime.InvokeVoidAsync("localStorage.setItem", GetKey(key), data);
     }

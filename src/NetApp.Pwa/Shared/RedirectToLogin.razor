@@ -1,0 +1,10 @@
+@inject NavigationManager _navigationManager
+@inject IStorageService _storageService
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        _navigationManager.NavigateTo("login");
+        await _storageService.ClearAsync();
+        //Navigation.NavigateTo($"login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}");
+    }
+}

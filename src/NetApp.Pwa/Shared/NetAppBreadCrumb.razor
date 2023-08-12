@@ -1,0 +1,61 @@
+@inject NavigationManager NavigationManager
+ <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+
+
+
+@code{
+
+    [Parameter] public string CurrentPage { get; set; } = null!;
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>();
+
+    private static Dictionary<string, string> BreadCrumbLabels = new()
+    {
+        {"counter", "Counter"},
+        {"fetchdata", "Fetch Data"},
+        {"login", "Login"},
+        {"logout", "Logout"},
+        {"register", "Register"},
+        {"profile", "Profile"},
+        {"user", "User"},
+        {"users", "Users"},
+        {"roles", "Roles"},
+        {"role", "Role"},
+        {"permissions", "Permissions"},
+        {"permission", "Permission"},
+        {"claims", "Claims"},
+        {"claim", "Claim"},
+        {"error", "Error"},
+        {"forbidden", "Forbidden"},
+        {"notfound", "Not Found"},
+        {"unauthorized", "Unauthorized"},
+        {"servererror", "Server Error"},
+        {"badrequest", "Bad Request"},
+        {"about", "About"},
+        {"contact", "Contact"},
+        {"privacy", "Privacy"},
+        {"terms", "Terms"},
+        {"home", "Home"},
+        {"Dashboard", "Home"},
+    };
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine(CurrentPage);
+        _items = new List<BreadcrumbItem>();
+        var path = CurrentPage.Replace(NavigationManager.BaseUri, "" );
+        var urlParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if(urlParts.Length > 0 )
+            _items.Add(new BreadcrumbItem("Home", NavigationManager.BaseUri));
+        
+        var routeUrl = "";
+        foreach (var item in urlParts)
+        {
+           if( BreadCrumbLabels.TryGetValue(item, out var label))
+           {
+                routeUrl += "/" + item;
+                _items.Add(new BreadcrumbItem(label, path));
+           }
+        }
+    }
+}

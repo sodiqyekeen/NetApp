@@ -1,8 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using MudBlazor;
-using NetApp.Extensions;
 using NetApp.UI.Infrastructure.Extensions;
 
 namespace NetApp.UI.Infrastructure;
@@ -27,7 +25,6 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(token), "jwt"));
-       // _revliogStateManager.CurrentUsername = claimsPrincipal.FindFirst("username")!.Value;
         return new AuthenticationState(claimsPrincipal);
     }
 
@@ -53,8 +50,6 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
             await NotifyLogoutAsync();
         }
     }
-
-
 
     private static List<Claim> GetClaims(string jwtToken)
     {

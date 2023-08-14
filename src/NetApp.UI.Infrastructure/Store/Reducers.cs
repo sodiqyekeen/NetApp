@@ -23,4 +23,8 @@ public static class Reducers
             return state;
         return state with { IsLoading = action.IsLoading };
     }
+
+    [ReducerMethod]
+    public static NetAppState ReduceSetAuthTokenAction(NetAppState state, SetAuthTokenAction action) =>
+        state with { AuthToken = action.AuthToken, RefreshToken = action.RefreshToken };
 }

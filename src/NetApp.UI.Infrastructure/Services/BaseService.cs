@@ -13,7 +13,7 @@ public abstract class BaseService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<IResponse<TResponse>>(uri, cancellation);
+            var response = await _httpClient.GetFromJsonAsync<Response<TResponse>>(uri, cancellation);
             return response!.Data!;
         }
         catch (Exception ex)
@@ -25,30 +25,30 @@ public abstract class BaseService
         }
     }
 
-    public async Task<IResponse<TResponse>> PostAsync<TRequest, TResponse>(string uri, TRequest request)
+    public async Task<Response<TResponse>> PostAsync<TRequest, TResponse>(string uri, TRequest request)
     {
         var response = await _httpClient.PostAsJsonAsync(uri, request);
         if (response.IsSuccessStatusCode)
-            return (await response.Content.ReadFromJsonAsync<IResponse<TResponse>>())!;
-        var failedResponse = await response.Content.ReadFromJsonAsync<IResponse>();
+            return (await response.Content.ReadFromJsonAsync<Response<TResponse>>())!;
+        var failedResponse = await response.Content.ReadFromJsonAsync<Response>();
         return Response<TResponse>.Fail(failedResponse!.Message);
     }
     public async Task<IResponse> PostAsync<TRequest>(string uri, TRequest request)
     {
         var response = await _httpClient.PostAsJsonAsync(uri, request);
-        return (await response.Content.ReadFromJsonAsync<IResponse>())!;
+        return (await response.Content.ReadFromJsonAsync<Response>())!;
     }
 
     public async Task<IResponse> PostAsync(string uri)
     {
         var response = await _httpClient.PostAsync(uri, null);
-        return (await response.Content.ReadFromJsonAsync<IResponse>())!;
+        return (await response.Content.ReadFromJsonAsync<Response>())!;
     }
 
     public async Task<IResponse> PutAsync<TRequest>(string uri, TRequest request)
     {
         var response = await _httpClient.PutAsJsonAsync(uri, request);
-        return (await response.Content.ReadFromJsonAsync<IResponse>())!;
+        return (await response.Content.ReadFromJsonAsync<Response>())!;
     }
 
     public async Task<IResponse> DeleteAsync(string uri)

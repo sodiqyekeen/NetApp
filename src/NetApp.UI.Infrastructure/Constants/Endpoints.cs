@@ -4,7 +4,7 @@ public static class Endpoints
 {
     public static class Identity
     {
-        private const string BaseUrl = "api/identity/";
+        private const string BaseUrl = "identity/";
         public const string Login = BaseUrl + "login";
         public const string RefreshToken = BaseUrl + "refresh-token";
         public const string Users = BaseUrl + "users";

@@ -27,6 +27,7 @@ public static class DependencyInjection
                 .AddTransient<AuthenticationStateProvider, NetAppAuthStateProvider>()
                 .AddScoped<IStorageService, LocalStorageService>()
                 .AddScoped<NetAppStateMiddleware>()
+                .AddScoped<IAuthenticationService, AuthenticationService>()
                 .AddFluxor(options =>
                 {
                     options.ScanAssemblies(typeof(DependencyInjection).Assembly);

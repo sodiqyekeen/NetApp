@@ -18,7 +18,6 @@ using NetApp.Infrastructure.Contexts;
 using NetApp.Infrastructure.Identity.Services;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
-using NetApp.Application;
 using NetApp.Domain.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

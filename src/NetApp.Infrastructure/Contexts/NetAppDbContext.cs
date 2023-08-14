@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NetApp.Domain.Common;
 using NetApp.Domain.Repositories;
 
@@ -15,9 +16,30 @@ public class NetAppDbContext : AuditableContext, INetAppDbContext
         _dateTimeService = dateTimeService;
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<NetAppUser>(entity =>
+           {
+               entity.ToTable(name: "User", "Identity");
+               entity.Property(e => e.Id).ValueGeneratedOnAdd();
+           });
+
+        modelBuilder.Entity<NetAppRole>(entity => entity.ToTable(name: "Role", "Identity"));
+        modelBuilder.Entity<IdentityUserRole<string>>(entity => entity.ToTable("UserRole", "Identity"));
+        modelBuilder.Entity<IdentityUserClaim<string>>(entity => entity.ToTable("UserClaim", "Identity"));
+        modelBuilder.Entity<IdentityUserLogin<string>>(entity => entity.ToTable("UserLogin", "Identity"));
+        modelBuilder.Entity<NetAppRoleClaim>(entity =>
+        {
+            entity.ToTable("RoleClaim", "Identity");
+            entity.HasOne(e => e.Role)
+            .WithMany(p => p.RoleClaims)
+            .HasForeignKey(e => e.RoleId)
+            .OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<IdentityUserToken<string>>(entity => entity.ToTable("UserToken", "Identity"));
+
 
     }
 

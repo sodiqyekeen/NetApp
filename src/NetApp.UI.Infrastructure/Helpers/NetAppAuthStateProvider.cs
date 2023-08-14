@@ -1,7 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Claims;
+using Fluxor;
 using Microsoft.AspNetCore.Components.Authorization;
 using NetApp.UI.Infrastructure.Extensions;
+using NetApp.UI.Infrastructure.Store;
 
 namespace NetApp.UI.Infrastructure;
 public class NetAppAuthStateProvider : AuthenticationStateProvider
@@ -9,34 +11,39 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
     private readonly HttpClient _httpClient;
     private readonly IStorageService _storageService;
     private readonly ISnackbar _snackbar;
-    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient)
+    private readonly IDispatcher _dispatcher;
+    private readonly IState<NetAppState> _appState;
+    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient, IDispatcher dispatcher, IState<NetAppState> appState)
     {
         _storageService = storageService;
         _snackbar = snackbar;
         _httpClient = httpClient;
+        _dispatcher = dispatcher;
+        _appState = appState;
     }
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var token = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
-        if (string.IsNullOrEmpty(token))
-        {
+        Console.WriteLine($"NetAppAuthStateProvider.GetAuthenticationStateAsync: {_appState.Value.AuthToken}");
+        if (string.IsNullOrWhiteSpace(_appState.Value.AuthToken))
             return AuthenticationStateExtensions.Anonymous;
-        }
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(token), "jwt"));
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _appState.Value.AuthToken!);
+        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(_appState.Value.AuthToken!), "jwt"));
         return new AuthenticationState(claimsPrincipal);
     }
 
-    public async Task NotifyAuthenticatedAsync(AuthenticationResponse response)
+    public void  NotifyAuthenticated(AuthenticationResponse response)
     {
-        await _storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
-        await _storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
+        // await _storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
+        // await _storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
+        _dispatcher.Dispatch(new SetAuthTokenAction(response.JWToken, response.RefreshToken));
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public async Task NotifyLogoutAsync()
     {
+        _dispatcher.Dispatch(new SetAuthTokenAction("", ""));
         await _storageService.ClearAsync();
         NotifyAuthenticationStateChanged(Task.FromResult(AuthenticationStateExtensions.Anonymous));
     }

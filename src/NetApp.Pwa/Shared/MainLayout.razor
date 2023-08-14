@@ -6,16 +6,16 @@
 <MudSnackbarProvider />
 <MudLayout>
  <AuthorizeView>
- <NotAuthorized>
-  <AuthorizedLayout>
-    @Body
-  </AuthorizedLayout>
- </NotAuthorized>
   <Authorized>
     <AuthorizedLayout>
       @Body
     </AuthorizedLayout>
   </Authorized>
+ <NotAuthorized>
+  <UnauthorizedLayout>
+    @Body
+  </UnauthorizedLayout>
+ </NotAuthorized>
 </AuthorizeView>
 </MudLayout>
 <Loader />

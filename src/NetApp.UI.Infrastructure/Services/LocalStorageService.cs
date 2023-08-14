@@ -29,12 +29,8 @@ internal class LocalStorageService : IStorageService
     public async Task RemoveItemAsync(string key) =>
      await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", GetKey(key));
 
-    public async Task SetItemAsync<T>(string key, T value)
-    {
-        Console.WriteLine("SetItemAsync: " + key);
-        var data = value.ToJson();
-        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", GetKey(key), data);
-    }
+    public async Task SetItemAsync<T>(string key, T value) =>
+     await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, value.ToJson());
 
     private static string GetKey(string key) => $"{Prefix}{key}";
     private async Task<List<string>> GetStorageKeysAsync()

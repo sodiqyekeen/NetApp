@@ -12,14 +12,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddClientServices(builder.Configuration);
 builder.Services.AddMudServices();
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+// builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-// builder.Services.AddTransient<AuthenticationHeaderHandler>()
-//     .AddScoped(sp => sp
-//         .GetRequiredService<IHttpClientFactory>()
-//         .CreateClient("NetApp.Pwa").EnableIntercept(sp))
-//     .AddHttpClient("NetApp.Pwa", client => client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] + "/api/"))
-//     .AddHttpMessageHandler<AuthenticationHeaderHandler>();
+builder.Services.AddTransient<AuthenticationHeaderHandler>()
+    .AddScoped(sp => sp
+        .GetRequiredService<IHttpClientFactory>()
+        .CreateClient("NetApp.Pwa").EnableIntercept(sp))
+    .AddHttpClient("NetApp.Pwa", client => client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] + "/api/"))
+    .AddHttpMessageHandler<AuthenticationHeaderHandler>();
 builder.Services.AddHttpClientInterceptor();
 
 await builder.Build().RunAsync();

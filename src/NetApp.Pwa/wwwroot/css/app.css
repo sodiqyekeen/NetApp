@@ -287,16 +287,7 @@
 
 /*End navmenu group dropdown*/
 
-/* 
---kt-highlight-bg: #1e1e3f;
-    --kt-highlight-border: rgba(255, 255, 255, 0.1);
-    --kt-highlight-btn-bg: #2d2d5e;
-    --kt-highlight-btn-bg-hover: #2d2d5e;
-    --kt-highlight-btn-color: rgba(255, 255, 255, 0.75);
-    --kt-highlight-btn-color-hover: #009ef7;
-    --kt-highlight-scrollbar-color: #323268;
-    --kt-highlight-scrollbar-color: #373773;
-     */
+
 
 .flex-column-fluid {
   flex: 1 0 auto;
@@ -367,5 +358,14 @@
 }
 
 .mud-table {
+  background-color: transparent;
+}
+
+.mud-shrink~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined, 
+.mud-input:focus-within~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined {
+  background-color: var(--mud-palette-surface);
+}
+
+.mud-input-slot.mud-input-root.mud-input-root-outlined{ 
   background-color: transparent;
 }

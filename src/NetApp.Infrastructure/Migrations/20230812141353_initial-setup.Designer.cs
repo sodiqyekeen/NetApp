@@ -11,14 +11,14 @@ using NetApp.Infrastructure.Contexts;
 namespace NetApp.Infrastructure.Migrations
 {
     [DbContext(typeof(NetAppDbContext))]
-    [Migration("20230614123958_initial-setup")]
+    [Migration("20230812141353_initial-setup")]
     partial class initialsetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
@@ -40,7 +40,7 @@ namespace NetApp.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaim", "Identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -62,7 +62,7 @@ namespace NetApp.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogin", "Identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -77,7 +77,7 @@ namespace NetApp.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRole", "Identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -96,7 +96,7 @@ namespace NetApp.Infrastructure.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserToken", "Identity");
                 });
 
             modelBuilder.Entity("NetApp.Domain.Entities.Audit", b =>
@@ -176,7 +176,7 @@ namespace NetApp.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Role", "Identity");
                 });
 
             modelBuilder.Entity("NetApp.Infrastructure.Identity.Models.NetAppRoleClaim", b =>
@@ -195,21 +195,17 @@ namespace NetApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RoleId1")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("RoleId1");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaim", "Identity");
                 });
 
             modelBuilder.Entity("NetApp.Infrastructure.Identity.Models.NetAppUser", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("AccessFailedCount")
@@ -290,7 +286,7 @@ namespace NetApp.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("User", "Identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -337,15 +333,11 @@ namespace NetApp.Infrastructure.Migrations
 
             modelBuilder.Entity("NetApp.Infrastructure.Identity.Models.NetAppRoleClaim", b =>
                 {
-                    b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppRole", null)
-                        .WithMany()
+                    b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppRole", "Role")
+                        .WithMany("RoleClaims")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppRole", "Role")
-                        .WithMany("RoleClaims")
-                        .HasForeignKey("RoleId1");
 
                     b.Navigation("Role");
                 });

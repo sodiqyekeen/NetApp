@@ -1,14 +1,25 @@
+using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using NetApp.Dtos;
 using NetApp.UI.Infrastructure;
+using NetApp.UI.Infrastructure.Services;
+using NetApp.UI.Infrastructure.Store;
+using NetApp.UI.Infrastructure.Extensions;
+using NetApp.Extensions;
 
 namespace NetApp.Pwa.Pages;
 
 public partial class Login
 {
     [Inject] private IStorageService StorageService { get; set; } = null!;
+    [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
+    [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private NetAppAuthStateProvider AuthStateProvider { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
     AuthenticationRequest loginModel = new();
     bool passwordVisibility;
     string passwordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -17,9 +28,27 @@ public partial class Login
 
     protected override async Task OnInitializedAsync()
     {
-        await StorageService.ClearAsync();
+        authenticationState = AuthStateProvider.GetAuthenticationStateAsync().Result;
+        if (authenticationState.IsAnonymous())
+        {
+            // await StorageService.ClearAsync();
+            await AuthStateProvider.NotifyLogoutAsync();
+            return;
+        }
+        Console.WriteLine($"Login.OnInitializedAsync: {authenticationState.User.Identity.Name}");
+        NavigationManager.NavigateTo("/");
     }
 
+    async void LoginAsync()
+    {
+        Dispatcher.ToggleLoader(true);
+        var response = await AuthenticationService.LoginAsync(loginModel);
+        Dispatcher.ToggleLoader(false);
+        if (!response.Succeeded)
+            Snackbar.Add(response.Message, Severity.Error);
+        else
+            NavigationManager.NavigateTo("/");
+    }
     void TogglePasswordVisibility()
     {
         if (passwordVisibility)

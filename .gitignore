@@ -480,3 +480,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/src/NetApp.Api/netapp.db-shm
+/src/NetApp.Api/netapp.db-wal

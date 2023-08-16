@@ -24,7 +24,7 @@ internal class AuthenticationService : BaseService, IAuthenticationService
     {
         var response = await PostAsync<AuthenticationRequest, AuthenticationResponse>(Endpoints.Identity.Login, request);
         if (!response.Succeeded) return response;
-        ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyAuthenticated(response.Data!);
+        await ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyAuthenticatedAsync(response.Data!);
         return response;
     }
 
@@ -68,6 +68,6 @@ internal class AuthenticationService : BaseService, IAuthenticationService
         var response = await PostAsync<RefreshTokenRequest, AuthenticationResponse>(Endpoints.Identity.RefreshToken, request);
         if (!response!.Succeeded) return;
 
-        ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyAuthenticated(response!.Data!);
+        await ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyAuthenticatedAsync(response!.Data!);
     }
 }

@@ -142,7 +142,7 @@ internal class RoleService : IRoleService
         if (newPermissions.Count == 0)
             throw new ApiException(_localizer["Admin role must have at least one permission."]);
         //TODO: check if admin role has all user's and role permissions
-        if (!newPermissions.IsSupersetOf(Permissions.User.View, Permissions.Role.View))
+        if (!newPermissions.ContainsAll(Permissions.User.View, Permissions.Role.View))
             throw new ApiException(_localizer["Admin role must have all user's and role permissions."]);
     }
 }

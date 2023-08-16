@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.UI", "src\NetApp.UI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.UI.Infrastructure", "src\NetApp.UI.Infrastructure\NetApp.UI.Infrastructure.csproj", "{472C3690-C0ED-439B-9781-F36F63D67D21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Pwa", "src\NetApp.Pwa\NetApp.Pwa.csproj", "{209B021E-4F73-493B-B593-F0AFAE31DED1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetApp.Pwa", "src\NetApp.Pwa\NetApp.Pwa.csproj", "{209B021E-4F73-493B-B593-F0AFAE31DED1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetApp.Tests", "src\NetApp.Tests\NetApp.Tests.csproj", "{2F44FC63-17FB-4299-803D-D27D6DEDE89C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{209B021E-4F73-493B-B593-F0AFAE31DED1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{209B021E-4F73-493B-B593-F0AFAE31DED1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{209B021E-4F73-493B-B593-F0AFAE31DED1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F44FC63-17FB-4299-803D-D27D6DEDE89C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F44FC63-17FB-4299-803D-D27D6DEDE89C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F44FC63-17FB-4299-803D-D27D6DEDE89C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F44FC63-17FB-4299-803D-D27D6DEDE89C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +78,7 @@ Global
 		{1F4214DF-6E23-4468-AAEB-651110AD1F75} = {71E5B373-90EE-499B-BCC3-E0159E7EF9F6}
 		{472C3690-C0ED-439B-9781-F36F63D67D21} = {71E5B373-90EE-499B-BCC3-E0159E7EF9F6}
 		{209B021E-4F73-493B-B593-F0AFAE31DED1} = {71E5B373-90EE-499B-BCC3-E0159E7EF9F6}
+		{2F44FC63-17FB-4299-803D-D27D6DEDE89C} = {71E5B373-90EE-499B-BCC3-E0159E7EF9F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C37F66A9-406E-4B95-8AC7-9ABD6AAD2289}

@@ -28,14 +28,14 @@ public partial class Login
 
     protected override async Task OnInitializedAsync()
     {
-        authenticationState = AuthStateProvider.GetAuthenticationStateAsync().Result;
+        authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
         if (authenticationState.IsAnonymous())
         {
-            // await StorageService.ClearAsync();
+            Console.WriteLine("Anonymous");
             await AuthStateProvider.NotifyLogoutAsync();
             return;
         }
-        Console.WriteLine($"Login.OnInitializedAsync: {authenticationState.User.Identity.Name}");
+        Console.WriteLine("Authenticated.");
         NavigationManager.NavigateTo("/");
     }
 
@@ -46,8 +46,6 @@ public partial class Login
         Dispatcher.ToggleLoader(false);
         if (!response.Succeeded)
             Snackbar.Add(response.Message, Severity.Error);
-        else
-            NavigationManager.NavigateTo("/");
     }
     void TogglePasswordVisibility()
     {

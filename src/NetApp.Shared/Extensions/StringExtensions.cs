@@ -55,4 +55,17 @@ public static class StringExtensions
         return new string(chars.ToArray());
     }
 
+    public static byte[] ParseBase64StringWithoutPadding(this string base64)
+    {
+        switch (base64.Length % 4)
+        {
+            case 2:
+                base64 += "==";
+                break;
+            case 3:
+                base64 += "=";
+                break;
+        }
+        return Convert.FromBase64String(base64);
+    }
 }

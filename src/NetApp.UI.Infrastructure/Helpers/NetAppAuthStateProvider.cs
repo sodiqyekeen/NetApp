@@ -11,39 +11,34 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
     private readonly HttpClient _httpClient;
     private readonly IStorageService _storageService;
     private readonly ISnackbar _snackbar;
-    private readonly IDispatcher _dispatcher;
-    private readonly IState<NetAppState> _appState;
-    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient, IDispatcher dispatcher, IState<NetAppState> appState)
+    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient)
     {
         _storageService = storageService;
         _snackbar = snackbar;
         _httpClient = httpClient;
-        _dispatcher = dispatcher;
-        _appState = appState;
     }
+
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var token = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
-        Console.WriteLine($"NetAppAuthStateProvider.GetAuthenticationStateAsync: {_appState.Value.AuthToken}");
-        if (string.IsNullOrWhiteSpace(_appState.Value.AuthToken))
+        if (string.IsNullOrWhiteSpace(token))
             return AuthenticationStateExtensions.Anonymous;
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", _appState.Value.AuthToken!);
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(_appState.Value.AuthToken!), "jwt"));
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(token), "jwt"));
         return new AuthenticationState(claimsPrincipal);
     }
 
-    public void  NotifyAuthenticated(AuthenticationResponse response)
+    public async Task NotifyAuthenticatedAsync(AuthenticationResponse response)
     {
-        // await _storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
-        // await _storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
-        _dispatcher.Dispatch(new SetAuthTokenAction(response.JWToken, response.RefreshToken));
+        await _storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
+        await _storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
+
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public async Task NotifyLogoutAsync()
     {
-        _dispatcher.Dispatch(new SetAuthTokenAction("", ""));
         await _storageService.ClearAsync();
         NotifyAuthenticationStateChanged(Task.FromResult(AuthenticationStateExtensions.Anonymous));
     }
@@ -58,26 +53,18 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
         }
     }
 
+    //Write unit test for this method
+
     private static List<Claim> GetClaims(string jwtToken)
     {
         string payload = jwtToken.Split(".")[1];
-        byte[] jsonBytes = ParseBase64StringWithoutPadding(payload);
+        byte[] jsonBytes = payload.ParseBase64StringWithoutPadding();
         var keyValuePairs = jsonBytes.FromBytes<Dictionary<string, object>>();
         var claims = keyValuePairs!.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()!)).ToList();
         return claims;
     }
 
-    private static byte[] ParseBase64StringWithoutPadding(string base64)
-    {
-        switch (base64.Length % 4)
-        {
-            case 2:
-                base64 += "==";
-                break;
-            case 3:
-                base64 += "=";
-                break;
-        }
-        return Convert.FromBase64String(base64);
-    }
+
+
+
 }

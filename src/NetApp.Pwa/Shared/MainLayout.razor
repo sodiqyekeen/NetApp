@@ -5,17 +5,17 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
- <AuthorizeView>
-  <Authorized>
-    <AuthorizedLayout>
-      @Body
-    </AuthorizedLayout>
-  </Authorized>
- <NotAuthorized>
-  <UnauthorizedLayout>
-    @Body
-  </UnauthorizedLayout>
- </NotAuthorized>
-</AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <AuthorizedLayout>
+                @Body
+            </AuthorizedLayout>
+        </Authorized>
+        <NotAuthorized>
+            <UnauthorizedLayout>
+                @Body
+            </UnauthorizedLayout>
+        </NotAuthorized>
+    </AuthorizeView>
 </MudLayout>
 <Loader />

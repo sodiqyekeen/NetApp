@@ -6,9 +6,7 @@ namespace NetApp.UI.Infrastructure.Store;
 public record NetAppState(
     bool IsDarkMode,
     int Count,
-    [property: JsonIgnore] bool IsLoading = false,
-    string? AuthToken = null,
-    string? RefreshToken = null
+    [property: JsonIgnore] bool IsLoading = false
     );
 
 public record ChangeThemeModeAction(bool IsDarkMode);

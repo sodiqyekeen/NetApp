@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using Fluxor;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using NetApp.UI.Infrastructure.Extensions;
 using NetApp.UI.Infrastructure.Store;
@@ -11,11 +12,13 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
     private readonly HttpClient _httpClient;
     private readonly IStorageService _storageService;
     private readonly ISnackbar _snackbar;
-    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient)
+    private readonly NavigationManager _navigationManager;
+    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient, NavigationManager navigationManager)
     {
         _storageService = storageService;
         _snackbar = snackbar;
         _httpClient = httpClient;
+        _navigationManager = navigationManager;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -23,17 +26,18 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
         var token = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
         if (string.IsNullOrWhiteSpace(token))
             return AuthenticationStateExtensions.Anonymous;
-
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(token), "jwt"));
-        return new AuthenticationState(claimsPrincipal);
+        var authenticationState = new AuthenticationState(claimsPrincipal);
+        if(authenticationState.IsTokenExpired())
+            return AuthenticationStateExtensions.Anonymous;
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        return authenticationState;
     }
 
     public async Task NotifyAuthenticatedAsync(AuthenticationResponse response)
     {
         await _storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
         await _storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
-
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
@@ -43,7 +47,7 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(Task.FromResult(AuthenticationStateExtensions.Anonymous));
     }
 
-    public async Task ValidateSession()
+    public async Task ValidateSessionAsync()
     {
         var currentAuthState = await GetAuthenticationStateAsync();
         if (currentAuthState.IsAnonymous() || currentAuthState.IsTokenExpired())
@@ -52,8 +56,6 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
             await NotifyLogoutAsync();
         }
     }
-
-    //Write unit test for this method
 
     private static List<Claim> GetClaims(string jwtToken)
     {

@@ -22,8 +22,7 @@ internal class LocalStorageService : IStorageService
     public async Task<T?> GetItemAsync<T>(string key)
     {
         var data = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", key);
-        if (data == null) return default;
-        return data.FromJson<T>();
+        return data == null ? default : data.FromJson<T>();
     }
 
     public async Task RemoveItemAsync(string key) =>

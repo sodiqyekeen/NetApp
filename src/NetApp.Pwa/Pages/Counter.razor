@@ -1,6 +1,7 @@
 ﻿@page "/counter"
 @inherits FluxorComponent
 @using Fluxor
+@attribute [Authorize]
 @inject IState<NetAppState> AppState
 @inject IDispatcher Dispatcher
 

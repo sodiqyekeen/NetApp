@@ -16,15 +16,10 @@ public static class Reducers
     public static NetAppState ReduceInitializeAppStateAction(NetAppState _, InitializeAppStateAction action) =>
         action.AppState;
 
+   
     [ReducerMethod]
-    public static NetAppState ReduceToggleLoadingAction(NetAppState state, ToggleLoadingAction action)
-    {
-        if (state.IsLoading == action.IsLoading)
-            return state;
-        return state with { IsLoading = action.IsLoading };
-    }
+    public static NetAppState ReduceToggleLoadingAction(NetAppState state, ToggleLoadingAction action) =>
+        state.IsLoading == action.IsLoading ? state : (state with { IsLoading = action.IsLoading });
 
-    [ReducerMethod]
-    public static NetAppState ReduceSetAuthTokenAction(NetAppState state, SetAuthTokenAction action) =>
-        state with { AuthToken = action.AuthToken, RefreshToken = action.RefreshToken };
+
 }

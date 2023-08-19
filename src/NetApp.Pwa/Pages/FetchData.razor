@@ -1,6 +1,7 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 @using NetApp.Pwa.Shared
+@attribute [Authorize]
 @inject IDispatcher Dispatcher
 <PageTitle>Weather forecast</PageTitle>
 
@@ -35,7 +36,7 @@
     {
         Dispatcher.ToggleLoader(true);
         await Task.Delay(2000);
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        //forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
         Dispatcher.ToggleLoader(false);
     }
     public class WeatherForecast

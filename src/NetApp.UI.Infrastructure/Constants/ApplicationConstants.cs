@@ -13,6 +13,16 @@ public static class ApplicationConstants
         public const string AppState = "netappstate";
     }
 
+    public static class Routes
+    {
+        public const string Login = "login";
+        public const string Home = "/";
+        public const string Dashboard = "dashboard";
+        public const string Users = "/users";
+        public const string Roles = "/roles";
+        public const string Profile = "/profile";
+        public const string NotFound = "/404";
+    }
 
 }
 

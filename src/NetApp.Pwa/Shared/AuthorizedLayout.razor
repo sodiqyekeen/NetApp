@@ -1,38 +1,33 @@
-@* @inherits Fluxor.Blazor.Web.Components.FluxorComponent *@
+<AuthorizeView>
+    <MudAppBar Elevation="0">
+        <MudIconButton Class="d-flex d-md-none"
+                       Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="ToggleDrawer" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Notifications"
+                       Color="Color.Inherit" />
 
-<MudAppBar Elevation="0">
-  <MudIconButton
-    Class="d-flex d-md-none"
-    Icon="@Icons.Material.Filled.Menu"
-    Color="Color.Inherit"
-    Edge="Edge.Start"
-    OnClick="ToggleDrawer"
-  />
-  <MudSpacer />
-  <MudIconButton Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit" />
-  <MudIconButton
-    Icon="@Icons.Material.Outlined.Notifications"
-    Color="Color.Inherit"
-  />
-  
-<MudSwitch T="bool" Checked="AppState.Value.IsDarkMode" CheckedChanged="ToggleTheme" Color="Color.Inherit" ThumbIcon="@(AppState.Value.IsDarkMode==true ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)" ></MudSwitch>
-</MudAppBar>
-<MudDrawer @bind-Open="_showDrawer" Elevation="1">
-  <MudDrawerHeader Style="height:120px; background-color:#1B1B28;">
-    <MudText Typo="Typo.h6">NetApp</MudText>
-  </MudDrawerHeader>
-  <NavMenu />
-</MudDrawer>
-<MudMainContent>
-  <MudPaper Elevation="1" Class="top-bar">
-    <MudToolBar>
-      <NetAppBreadCrumb CurrentPage="@RoutingState.Value.Uri" /> 
-      <MudSpacer />
-       
-    </MudToolBar>
-  </MudPaper>
-  <MudContainer MaxWidth="MaxWidth.Large" Class="pt-8">
-        @ChildContent
-  </MudContainer>
-</MudMainContent>
+        <MudSwitch T="bool" Checked="AppState.Value.IsDarkMode" CheckedChanged="ToggleTheme" Color="Color.Inherit" ThumbIcon="@(AppState.Value.IsDarkMode==true ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)"></MudSwitch>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_showDrawer" Elevation="1">
+        <MudDrawerHeader Style="height:120px; background-color:#1B1B28;">
+            <MudText Typo="Typo.h6">NetApp</MudText>
+        </MudDrawerHeader>
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudPaper Elevation="1" Class="top-bar">
+            <MudToolBar>
+                <NetAppBreadCrumb CurrentPage="@RoutingState.Value.Uri" />
+                <MudSpacer />
 
+            </MudToolBar>
+        </MudPaper>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="pt-8">
+            @ChildContent
+        </MudContainer>
+    </MudMainContent>
+</AuthorizeView>

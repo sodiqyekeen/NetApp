@@ -4,16 +4,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using NetApp.Dtos;
 using NetApp.UI.Infrastructure;
+using NetApp.UI.Infrastructure.Extensions;
 using NetApp.UI.Infrastructure.Services;
 using NetApp.UI.Infrastructure.Store;
-using NetApp.UI.Infrastructure.Extensions;
-using NetApp.Extensions;
 
 namespace NetApp.Pwa.Pages;
 
 public partial class Login
 {
-    [Inject] private IStorageService StorageService { get; set; } = null!;
     [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
     [Inject] private IDispatcher Dispatcher { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -24,19 +22,18 @@ public partial class Login
     bool passwordVisibility;
     string passwordInputIcon = Icons.Material.Filled.VisibilityOff;
     InputType passwordInputType = InputType.Password;
-    AuthenticationState? authenticationState;
 
     protected override async Task OnInitializedAsync()
     {
-        authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var authenticationState = await AuthStateProvider.GetAuthenticationStateAsync();
         if (authenticationState.IsAnonymous())
         {
-            Console.WriteLine("Anonymous");
             await AuthStateProvider.NotifyLogoutAsync();
-            return;
         }
-        Console.WriteLine("Authenticated.");
-        NavigationManager.NavigateTo("/");
+        else
+        {
+            NavigationManager.NavigateTo("dashboard");
+        }
     }
 
     async void LoginAsync()

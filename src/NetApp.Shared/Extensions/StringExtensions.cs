@@ -68,4 +68,17 @@ public static class StringExtensions
         }
         return Convert.FromBase64String(base64);
     }
+
+    /// <summary>
+    /// Returns the current page from the provided URI.
+    /// </summary>
+    /// <param name="uri">The URI to find the current page in.</param>
+    /// <returns>A string representing the current page.</returns>
+    public static string GetCurrentPageFromUri(this string uri)
+    {
+        var uriSegments = uri.Split('/');
+        var currentPage = uriSegments[^1];
+        return currentPage;
+    }
+
 }

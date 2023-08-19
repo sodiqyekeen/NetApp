@@ -24,7 +24,7 @@ public class NetAppAuthStateProviderTests
         _snackbar = new Mock<ISnackbar>();
         _httpClient = new Mock<HttpClient>(MockBehavior.Default);
 
-        _authStateProvider = new NetAppAuthStateProvider(_storageService.Object, _snackbar.Object, _httpClient.Object);
+       // _authStateProvider = new NetAppAuthStateProvider(_storageService.Object, _snackbar.Object, _httpClient.Object);
     }
 
     [Fact(DisplayName = "GetAuthenticationStateAsync when token is null or empty return anonymous authenticationstate")]
@@ -71,7 +71,7 @@ public class NetAppAuthStateProviderTests
     public async Task ValidateSession_ReturnsUserNotAuthenticatedWhenTokenIsNullOrEmpty()
     {
         _storageService.Setup(x => x.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken)).ReturnsAsync((string)null);
-        await _authStateProvider.ValidateSession();
+        await _authStateProvider.ValidateSessionAsync();
         // _snackbar.Verify(x => x.Add(ApplicationConstants.ErrorMessages.SessionTimeout, It.IsAny<Severity>()), Times.Once);
     }
 
@@ -85,7 +85,7 @@ public class NetAppAuthStateProviderTests
         //  _httpClient.Setup(x => x.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "dummyToken"));
         var result = await _authStateProvider.GetAuthenticationStateAsync();
         Assert.IsAssignableFrom<ClaimsPrincipal>(result.User);
-        await _authStateProvider.ValidateSession();
+        await _authStateProvider.ValidateSessionAsync();
         // _snackbar.Verify(x => x.Add(ApplicationConstants.ErrorMessages.SessionTimeout, It.IsAny<Severity>()), Times.Once);
         _storageService.Verify(x => x.ClearAsync(), Times.Once());
         Assert.NotNull(result);

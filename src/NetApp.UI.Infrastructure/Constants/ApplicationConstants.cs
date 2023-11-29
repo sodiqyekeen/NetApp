@@ -22,6 +22,9 @@ public static class ApplicationConstants
         public const string Roles = "/roles";
         public const string Profile = "/profile";
         public const string NotFound = "/404";
+        public const string ForgotPassword = "/forgot-password";
+        public const string ResetPassword = "/reset-password";
+        public const string ConfirmEmail = "/confirm-email";
     }
 
 }

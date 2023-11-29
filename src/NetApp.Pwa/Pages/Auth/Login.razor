@@ -1,5 +1,4 @@
-﻿@page "/login"
-@attribute [Route(ApplicationConstants.Routes.Login)]
+﻿@attribute [Route(ApplicationConstants.Routes.Login)]
 @attribute [AllowAnonymous]
 
 <MudPaper Elevation="6" Class="pa-6">
@@ -26,7 +25,7 @@
                           autocomplete="off" />
             <div class="d-flex justify-space-between mt-3">
                 <MudCheckBox Label="Remember me" @bind-Checked="loginModel.RememberMe" />
-                <MudLink Href="/authentication/reset-password"><small>Forgot Password?</small></MudLink>
+                <MudLink Class="align-self-center" Href="@(ApplicationConstants.Routes.ForgotPassword)"><small>Forgot Password?</small></MudLink>
             </div>
 
             <MudButton Class="my-4" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth="true">Sign In</MudButton>

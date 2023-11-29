@@ -14,7 +14,7 @@ internal static class IdentityEndpoints
              Results.Ok(await identityService.RefreshTokenAsync(request, GetIPAddress(context))))
              .Produces<IResponse<AuthenticationResponse>>(StatusCodes.Status200OK);
 
-        group.MapGet("/users", async (IIdentityService identityService, PagingOptions pagingOptions, CancellationToken cancellationToken) =>
+        group.MapGet("/users", async (IIdentityService identityService, [AsParameters] PagingOptions pagingOptions, CancellationToken cancellationToken) =>
             Results.Ok(await identityService.GetUsersAsync(pagingOptions,cancellationToken)))
             .RequireAuthorization()
             .Produces<IResponse<IEnumerable<User>>>(StatusCodes.Status200OK);

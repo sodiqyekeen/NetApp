@@ -1,9 +1,12 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Routing;
+using MudBlazor;
 using NetApp.Extensions;
 using NetApp.UI.Infrastructure;
 using NetApp.UI.Infrastructure.Extensions;
+using NetApp.UI.Infrastructure.Services;
 using NetApp.UI.Infrastructure.Store;
 
 namespace NetApp.Pwa.Shared;
@@ -23,7 +26,9 @@ public partial class AuthorizedLayout : IDisposable
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private NetAppAuthStateProvider AuthStateProvider { get; set; } = null!;
-
+    [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
+    //[Inject] private AuthenticationState AuthenticationState { get; set; } = null!;
+         
     private HashSet<string> _anonymousPages = new()
     {
         "login",
@@ -35,6 +40,10 @@ public partial class AuthorizedLayout : IDisposable
     protected override void OnInitialized()
     {
         NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+    private async void Logout()
+    {
+        await AuthenticationService.LogoutAsync();
     }
 
     private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)

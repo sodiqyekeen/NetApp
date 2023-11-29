@@ -67,30 +67,6 @@ public class NetAppAuthStateProviderTests
         Assert.True(result.User.Identity?.IsAuthenticated == false);
     }
 
-    [Fact(DisplayName = "ValidateSession returns User Not Authenticated when Token is null or empty")]
-    public async Task ValidateSession_ReturnsUserNotAuthenticatedWhenTokenIsNullOrEmpty()
-    {
-        _storageService.Setup(x => x.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken)).ReturnsAsync((string)null);
-        await _authStateProvider.ValidateSessionAsync();
-        // _snackbar.Verify(x => x.Add(ApplicationConstants.ErrorMessages.SessionTimeout, It.IsAny<Severity>()), Times.Once);
-    }
-
-    [Fact(DisplayName = "ValidateSession notifies Logout when Current Authentication State is Anonymous")]
-    public async Task ValidateSession_NotifiesLogoutWhenCurrentAuthenticationStateIsAnonymous()
-    {
-        var mockIdentity = new Mock<ClaimsIdentity>();
-        var mockPrincipal = new Mock<ClaimsPrincipal>();
-        mockPrincipal.Setup(x => x.Identity).Returns(mockIdentity.Object);
-        _storageService.Setup(x => x.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken)).ReturnsAsync("dummyToken");
-        //  _httpClient.Setup(x => x.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "dummyToken"));
-        var result = await _authStateProvider.GetAuthenticationStateAsync();
-        Assert.IsAssignableFrom<ClaimsPrincipal>(result.User);
-        await _authStateProvider.ValidateSessionAsync();
-        // _snackbar.Verify(x => x.Add(ApplicationConstants.ErrorMessages.SessionTimeout, It.IsAny<Severity>()), Times.Once);
-        _storageService.Verify(x => x.ClearAsync(), Times.Once());
-        Assert.NotNull(result);
-        Assert.True(result.User.Identity?.IsAuthenticated == false);
-    }
 
     [Fact(DisplayName = "Should get claims from JWT token")]
     public void ShouldGetClaimsFromJwtToken()

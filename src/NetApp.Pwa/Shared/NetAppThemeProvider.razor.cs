@@ -65,6 +65,7 @@ public partial class NetAppThemeProvider
             LinesDefault = new MudBlazor.Utilities.MudColor("#2B2B40"),
             DrawerText = new MudBlazor.Utilities.MudColor("#FFFFFF"),
             TextPrimary=new MudBlazor.Utilities.MudColor("#ffffffe0"),
+            Surface=new MudBlazor.Utilities.MudColor("#1e1e2d"),
         },
         LayoutProperties = new LayoutProperties
         {

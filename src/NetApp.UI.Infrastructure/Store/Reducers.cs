@@ -16,10 +16,12 @@ public static class Reducers
     public static NetAppState ReduceInitializeAppStateAction(NetAppState _, InitializeAppStateAction action) =>
         action.AppState;
 
-   
+
     [ReducerMethod]
     public static NetAppState ReduceToggleLoadingAction(NetAppState state, ToggleLoadingAction action) =>
         state.IsLoading == action.IsLoading ? state : (state with { IsLoading = action.IsLoading });
 
-
+    [ReducerMethod]
+    public static NetAppState ReduceSetCurrentUserDetailAction(NetAppState state, SetCurrentUserDetailAction action) =>
+        state with { CurrentUser = action.User };
 }

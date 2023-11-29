@@ -1,0 +1,7 @@
+﻿/*On screens not mobile, set width for .auth-container*/
+
+@media (min-width: 960px) {
+  .auth-container {
+    width: 400px;
+  }
+}

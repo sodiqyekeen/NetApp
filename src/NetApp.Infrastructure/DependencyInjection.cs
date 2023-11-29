@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace NetApp.Infrastructure;
 public static class DependencyInjection
@@ -33,7 +34,8 @@ public static class DependencyInjection
         services.AddScoped<INetAppDbContext>(provider => provider.GetService<NetAppDbContext>()!);
         services.AddIdentity<NetAppUser, NetAppRole>()
            .AddEntityFrameworkStores<NetAppDbContext>()
-           .AddDefaultTokenProviders();
+           .AddDefaultTokenProviders()
+           .AddApiEndpoints();
 
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.AddScoped<IDatabaseSeeder, ApplicationDataSeeder>();
@@ -114,4 +116,5 @@ public static class DependencyInjection
         var seederService = serviceScope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
         seederService.Initialize();
     }
+
 }

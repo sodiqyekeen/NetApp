@@ -1,13 +1,16 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace NetApp.UI.Infrastructure.Extensions;
 public static class AuthenticationStateExtensions
 {
     public static AuthenticationState Anonymous { get; set; } = new(new ClaimsPrincipal(new ClaimsPrincipal()));
 
-    public static string? Username(this AuthenticationState authenticationState) =>
-        authenticationState.User.FindFirst("username")?.Value;
+    public static string Username(this AuthenticationState authenticationState) =>
+        authenticationState.User.FindFirst(ClaimTypes.Name)?.Value??"";
+
+    public static string UserEmail(this AuthenticationState authenticationState) =>
+        authenticationState.User.FindFirst(ClaimTypes.Email)?.Value ?? "";
 
     public static bool IsAnonymous(this AuthenticationState authenticationState) =>
        authenticationState == Anonymous;
@@ -15,6 +18,9 @@ public static class AuthenticationStateExtensions
     public static bool IsTokenExpired(this AuthenticationState currentAuthState)
     {
         TimeSpan timeDiff = GetTokenExpiration(currentAuthState);
+#if DEBUG
+        Console.WriteLine($"Token expires in {timeDiff.Minutes} minutes");
+#endif
         return timeDiff.Seconds < 10;
     }
 
@@ -35,5 +41,10 @@ public static class AuthenticationStateExtensions
     {
         var permissions = currentUser.FindAll(c => c.Type == SharedConstants.CustomClaimTypes.Permission);
         return permissions != null && permissions.Any(r => r.Value.Contains(permission));
+    }
+
+    public static bool Authorize(this AuthenticationState authState, string permission)
+    {
+        return authState.User.FindFirst(c => c.Type == SharedConstants.CustomClaimTypes.Permission && c.Value.Contains(permission)) != null;
     }
 }

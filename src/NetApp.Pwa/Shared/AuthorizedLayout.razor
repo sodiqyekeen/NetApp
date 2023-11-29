@@ -1,5 +1,5 @@
 <AuthorizeView>
-    <MudAppBar Elevation="0">
+    <MudAppBar Elevation="0" Class="pr-8">
         <MudIconButton Class="d-flex d-md-none"
                        Icon="@Icons.Material.Filled.Menu"
                        Color="Color.Inherit"
@@ -9,8 +9,34 @@
         <MudIconButton Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit" />
         <MudIconButton Icon="@Icons.Material.Outlined.Notifications"
                        Color="Color.Inherit" />
-
         <MudSwitch T="bool" Checked="AppState.Value.IsDarkMode" CheckedChanged="ToggleTheme" Color="Color.Inherit" ThumbIcon="@(AppState.Value.IsDarkMode==true ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)"></MudSwitch>
+        <MudMenu ActivationEvent="@MouseEvent.LeftClick" AnchorOrigin="@Origin.BottomLeft" Color="Color.Inherit">
+            <ActivatorContent>
+                <MudAvatar Color="Color.Primary" Style="height:35px; width:35px; font-size:1.25rem;">
+                    @context.Username().Substring(0,1).ToUpper()
+                </MudAvatar>
+            </ActivatorContent>
+            <ChildContent>
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Square="true">
+                                <MudImage Src="icon-512.png" />
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">@context.Username()</MudText>
+                            <MudText Typo="Typo.caption">@context.UserEmail()</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                </MudCard>
+                <MudDivider Class="mb-2" />
+                <MudMenuItem>Profile</MudMenuItem>
+                <MudMenuItem>Settings</MudMenuItem>
+                <MudMenuItem OnClick="Logout">Sign Out</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
+
     </MudAppBar>
     <MudDrawer @bind-Open="_showDrawer" Elevation="1">
         <MudDrawerHeader Style="height:120px; background-color:#1B1B28;">

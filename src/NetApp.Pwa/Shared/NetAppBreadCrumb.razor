@@ -1,9 +1,9 @@
 @inject NavigationManager NavigationManager
- <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
+<MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
 
 
-@code{
+@code {
 
     [Parameter] public string CurrentPage { get; set; } = null!;
 
@@ -43,19 +43,19 @@
     {
         Console.WriteLine(CurrentPage);
         _items = new List<BreadcrumbItem>();
-        var path = CurrentPage.Replace(NavigationManager.BaseUri, "" );
+        var path = CurrentPage.Replace(NavigationManager.BaseUri, "");
         var urlParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if(urlParts.Length > 0 )
-            _items.Add(new BreadcrumbItem("Home", NavigationManager.BaseUri));
-        
+        if (urlParts.Length > 0 && !urlParts[0].Equals("dashboard", StringComparison.OrdinalIgnoreCase))
+            _items.Add(new BreadcrumbItem("Home", $"{NavigationManager.BaseUri}dashboard"));
+
         var routeUrl = "";
         foreach (var item in urlParts)
         {
-           if( BreadCrumbLabels.TryGetValue(item, out var label))
-           {
+            if (BreadCrumbLabels.TryGetValue(item, out var label))
+            {
                 routeUrl += "/" + item;
                 _items.Add(new BreadcrumbItem(label, path));
-           }
+            }
         }
     }
 }

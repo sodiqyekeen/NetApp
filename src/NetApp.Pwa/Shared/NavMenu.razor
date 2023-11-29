@@ -1,18 +1,18 @@
 ﻿<MudNavMenu Class="mud-width-full my-2">
-        <MudNavLink Href="/" Icon="@Icons.Material.Outlined.Dashboard" Match="NavLinkMatch.All" >Dashboard</MudNavLink>
-                <MudNavLink Href="counter" Icon="@Icons.Material.Outlined.Add">Counter</MudNavLink>
-        <MudNavLink Href="fetchdata" Icon="@Icons.Material.Outlined.List"  >Fetch Data</MudNavLink>
+    <MudNavLink Href="@ApplicationConstants.Routes.Dashboard" Icon="@Icons.Material.Outlined.Dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+    <MudNavLink Href="counter" Icon="@Icons.Material.Outlined.Add">Counter</MudNavLink>
+    <MudNavLink Href="fetchdata" Icon="@Icons.Material.Outlined.List">Fetch Data</MudNavLink>
 
-        <MudNavGroup Title="Level 0" Icon="@Icons.Material.Filled.Settings" >
-            <MudNavGroup Title="Level 1" Icon="@Icons.Material.Filled.AdminPanelSettings" >
-                <MudNavGroup Title="Level 2" Icon="@Icons.Material.Filled.People" >
-                    <MudNavGroup Title="Level 3" Icon="@Icons.Material.Filled.Lock" >
-                        <MudNavLink Href="/delete" Icon="@Icons.Material.Filled.DeleteForever">Delete Password</MudNavLink>
-                    </MudNavGroup>
+    <MudNavGroup Title="Level 0" Icon="@Icons.Material.Filled.Settings">
+        <MudNavGroup Title="Level 1" Icon="@Icons.Material.Filled.AdminPanelSettings">
+            <MudNavGroup Title="Level 2" Icon="@Icons.Material.Filled.People">
+                <MudNavGroup Title="Level 3" Icon="@Icons.Material.Filled.Lock">
+                    <MudNavLink Href="/delete" Icon="@Icons.Material.Filled.DeleteForever">Delete Password</MudNavLink>
                 </MudNavGroup>
             </MudNavGroup>
         </MudNavGroup>
-        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
-    </MudNavMenu>
+    </MudNavGroup>
+    <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
+</MudNavMenu>
 
 

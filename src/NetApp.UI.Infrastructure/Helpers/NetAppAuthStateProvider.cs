@@ -47,16 +47,6 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(Task.FromResult(AuthenticationStateExtensions.Anonymous));
     }
 
-    public async Task ValidateSessionAsync()
-    {
-        var currentAuthState = await GetAuthenticationStateAsync();
-        if (currentAuthState.IsAnonymous() || currentAuthState.IsTokenExpired())
-        {
-            _snackbar.Add(ApplicationConstants.ErrorMessages.SessionTimeout, Severity.Error);
-            await NotifyLogoutAsync();
-        }
-    }
-
     private static List<Claim> GetClaims(string jwtToken)
     {
         string payload = jwtToken.Split(".")[1];

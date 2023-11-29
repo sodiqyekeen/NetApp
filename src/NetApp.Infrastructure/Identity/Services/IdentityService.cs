@@ -153,11 +153,11 @@ internal class IdentityService : IIdentityService
         var users = new List<User>();
         var usersQuery = _userManager.Users.AsQueryable();
         usersQuery = usersQuery.Where(u => u.Id != superAdmin);
-        var paginatedList = await usersQuery.ToPaginatedResponse(pagingOptions.PageIndex, pagingOptions.PageSize, cancellationToken);
+        var paginatedList = await usersQuery.ToPaginatedResponse(pagingOptions.PageIndex!.Value, pagingOptions.PageSize!.Value, cancellationToken);
         foreach (var user in paginatedList.Data)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
-            users.Add(new User(user.Id, user.UserName!, user.Email!, userRoles.ToList(), user.Active));
+            users.Add(new User(user.Id, user.UserName!, user.Email!, [.. userRoles], user.Active));
         }
         return Response<PaginatedResponse<User>>.Success(new PaginatedResponse<User>(users, paginatedList.TotalItems, paginatedList.PageSize, paginatedList.PageNumber));
     }

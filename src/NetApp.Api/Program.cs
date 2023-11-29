@@ -1,12 +1,12 @@
-global using NetApp.Models;
-global using NetApp.Dtos;
 global using NetApp.Application.Services;
-using NetApp.Infrastructure;
-using NetApp.Application;
-
+global using NetApp.Dtos;
+global using NetApp.Models;
+using NetApp.Api;
 using NetApp.Api.Endpoints;
 using NetApp.Api.Services;
-using NetApp.Api;
+using NetApp.Application;
+using NetApp.Infrastructure;
+using NetApp.Infrastructure.Identity.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ISessionService, SessionService>();
@@ -15,13 +15,7 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy( policy =>
-    {
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["AllowedHosts"] ?? "*");
-    });
-});
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["AllowedHosts"] ?? "*")));
 
 var app = builder.Build();
 
@@ -38,6 +32,7 @@ app.UseAuthorization();
 app.UseMiddleware<ApiErrorHandler>();
 var api = app.MapGroup("/api").WithOpenApi();
 api.MapIdentityEndpoints();
+//app.MapIdentityApi<NetAppUser>();
 
 app.SeedDatabase();
 app.Run();

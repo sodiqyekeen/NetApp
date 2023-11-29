@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Fluxor;
 using Microsoft.AspNetCore.Components.Authorization;
 using NetApp.UI.Infrastructure.Extensions;
 
@@ -8,10 +9,15 @@ internal class AuthenticationService : BaseService, IAuthenticationService
 {
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly IStorageService _storageService;
-    public AuthenticationService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, IStorageService storageService) : base(httpClient)
+    private readonly IDispatcher _dispatcher;
+    public AuthenticationService(HttpClient httpClient,
+        AuthenticationStateProvider authenticationStateProvider,
+        IStorageService storageService,
+        IDispatcher dispatcher) : base(httpClient)
     {
         _authenticationStateProvider = authenticationStateProvider;
         _storageService = storageService;
+        _dispatcher = dispatcher;
     }
 
     public async Task<ClaimsPrincipal> GetCurrentUser()

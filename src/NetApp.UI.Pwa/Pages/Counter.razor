@@ -1,0 +1,80 @@
+﻿@page "/counter"
+@inject IDialogService DialogService
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button @onclick="OpenDemoModal" class="bg-blue-500 hover:bg-blue-700  font-bold py-2 px-4 rounded">
+    Open Modal
+</button>
+
+<div id="myModal" class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center hidden">
+    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+
+    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+        <div class="modal-content py-4 text-left px-6">
+            <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-bold">Modal Header</p>
+                <div class="modal-close cursor-pointer z-50">
+                    <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                        <path d="M1.393 16.561l12.854-12.854c.375-.375.982-.375 1.357 0l2.121 2.121c.375.375.375.982 0 1.357L5.271 18l-2.121-2.121c-.375-.375-.375-.982 0-1.357z" />
+                        <path d="M14.207 16.561L1.354 3.707c-.375-.375-.375-.981 0-1.356l2.121-2.121c.375-.375.982-.375 1.357 0L16.607 12.5l-2.121 2.061c-.375.375-.982.375-1.357 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <p>Modal body goes here.</p>
+            </div>
+
+            <div class="modal-footer flex justify-end pt-2">
+                <button onclick="closeModal()" class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2">Action</button>
+                <button onclick="closeModal()" class="modal-close px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="relative inline-block text-left">
+    <button onclick="toggleMenu()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500" id="options-menu" aria-haspopup="true" aria-expanded="true" data-dropdown-toggle="dropdown-1">
+        Open menu
+        <!-- Heroicon name: chevron-down -->
+        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden" id="dropdown-1" aria-labelledby="options-menu" role="menu">
+        <div class="py-1" role="none">
+            <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">Account settings</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">Support</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">License</a>
+            <form method="POST" action="#">
+                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                    Sign out
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    private int currentCount = 0;
+    private string activeLabel = "";
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    async void OpenDemoModal()
+    {
+        var dialog = await DialogService.ShowDialogAsync<Modal>(new DialogParameters());
+    }
+}

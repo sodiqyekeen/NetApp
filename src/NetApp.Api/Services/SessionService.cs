@@ -1,22 +1,19 @@
+using NetApp.Domain.Constants;
+using NetApp.Domain.Entities;
+using NetApp.Extensions;
 using System.Security.Claims;
 
 namespace NetApp.Api.Services
 {
-    public class SessionService : ISessionService
+    public class SessionService(IHttpContextAccessor httpContextAccessor) : ISessionService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        public Session CurrentSession => httpContextAccessor.HttpContext!.Session.GetString(DomainConstants.SessionKey)!.FromJson<Session>();
+        public string Username => httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name)??"";
 
-        public SessionService(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
+        public string Email => httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email)??"";
 
-        public string Username => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name)??"";
+        public string UserId => httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)??"";
 
-        public string Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email)??"";
-
-        public string UserId => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)??"";
-
-        public string Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role)??"";
+        public string Role => httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role)??"";
     }
 }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NetApp.UI.Pwa</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.min.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="NetApp.UI.Pwa.styles.css" rel="stylesheet" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+</head>
+
+
+<body class="h-full">
+    <style>
+        .loader {
+            width: 80px;
+            height: 50px;
+            position: relative;
+            margin: 50vh auto;
+        }
+
+        .loader-text {
+            position: absolute;
+            top: 0;
+            padding: 0;
+            margin: 0;
+            color: var(--mud-palette-text-primary);
+            animation: text_713 3.5s ease both infinite;
+            font-size: .8rem;
+            letter-spacing: 1px;
+        }
+
+        .load {
+            background-color: #1e1e2d;
+            border-radius: 50px;
+            display: block;
+            height: 16px;
+            width: 16px;
+            bottom: 0;
+            position: absolute;
+            transform: translateX(64px);
+            animation: loading_713 3.5s ease both infinite;
+        }
+
+            .load::before {
+                position: absolute;
+                content: "";
+                width: 100%;
+                height: 100%;
+                background-color: #9899ac;
+                border-radius: inherit;
+                animation: loading2_713 3.5s ease both infinite;
+            }
+
+        @keyframes text_713 {
+            0% {
+                letter-spacing: 1px;
+                transform: translateX(0px);
+            }
+
+            40% {
+                letter-spacing: 2px;
+                transform: translateX(26px);
+            }
+
+            80% {
+                letter-spacing: 1px;
+                transform: translateX(32px);
+            }
+
+            90% {
+                letter-spacing: 2px;
+                transform: translateX(0px);
+            }
+
+            100% {
+                letter-spacing: 1px;
+                transform: translateX(0px);
+            }
+        }
+
+        @keyframes loading_713 {
+            0% {
+                width: 16px;
+                transform: translateX(0px);
+            }
+
+            40% {
+                width: 100%;
+                transform: translateX(0px);
+            }
+
+            80% {
+                width: 16px;
+                transform: translateX(64px);
+            }
+
+            90% {
+                width: 100%;
+                transform: translateX(0px);
+            }
+
+            100% {
+                width: 16px;
+                transform: translateX(0px);
+            }
+        }
+
+        @keyframes loading2_713 {
+            0% {
+                transform: translateX(0px);
+                width: 16px;
+            }
+
+            40% {
+                transform: translateX(0%);
+                width: 80%;
+            }
+
+            80% {
+                width: 100%;
+                transform: translateX(0px);
+            }
+
+            90% {
+                width: 80%;
+                transform: translateX(15px);
+            }
+
+            100% {
+                transform: translateX(0px);
+                width: 16px;
+            }
+        }
+
+        /*End Loader*/
+    </style>
+    <div id="app">
+        <div class="loader">
+            <span class="loader-text">loading...</span>
+            <span class="load"></span>
+        </div>
+    </div>
+
+    <!--<div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>-->
+    <!--<script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>-->
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+    <script>
+        window.initialiseFlowbite = () => {
+            initFlowbite();
+        }
+    </script>
+    <script>
+        function openModal() {
+            var modal = document.getElementById("myModal");
+            modal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("myModal");
+            modal.classList.add("hidden");
+        }
+        function toggleMenu() {
+            var menu = document.getElementById("dropdown-1");
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+
+</html>

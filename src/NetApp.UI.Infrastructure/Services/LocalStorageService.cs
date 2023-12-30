@@ -12,11 +12,6 @@ internal class LocalStorageService : IStorageService
     public async Task ClearAsync()
     {
         await _jsRuntime.InvokeVoidAsync("localStorage.clear");
-        // var keys = await GetStorageKeysAsync();
-        // foreach (var key in keys)
-        // {
-        //     if (key.StartsWith(Prefix))
-        // }
     }
 
     public async Task<T?> GetItemAsync<T>(string key)
@@ -32,9 +27,4 @@ internal class LocalStorageService : IStorageService
      await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, value.ToJson());
 
     private static string GetKey(string key) => $"{Prefix}{key}";
-    private async Task<List<string>> GetStorageKeysAsync()
-    {
-        var keysJson = await _jsRuntime.InvokeAsync<string>("localStorage.keys");
-        return keysJson.FromJson<List<string>>() ?? new List<string>();
-    }
 }

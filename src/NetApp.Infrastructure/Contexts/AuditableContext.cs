@@ -23,7 +23,7 @@ public abstract class AuditableContext : IdentityDbContext<NetAppUser, NetAppRol
 
     public DbSet<Audit> AuditTrails => Set<Audit>();
 
-    public virtual async Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken = new())
+    public virtual async Task<int> SaveChangesAsync(string userId, CancellationToken cancellationToken)
     {
         var auditEntries = OnBeforeSaveChanges(userId);
         var result = await base.SaveChangesAsync(cancellationToken);

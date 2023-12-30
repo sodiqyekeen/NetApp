@@ -6,10 +6,10 @@ public record UserRolesResponse(string UserId, List<UserRoleModel> Roles);
 
 public record UserRoleModel(string RoleId, string RoleName, string RoleDescription);
 
-public record User(
-     string Id,
-     string UserName,
-     string Email,
-     List<string> Roles,
-     bool Active
-);
+// public record User(
+//      string Id,
+//      string UserName,
+//      string Email,
+//      //List<string> Roles,
+//      bool Active
+// );

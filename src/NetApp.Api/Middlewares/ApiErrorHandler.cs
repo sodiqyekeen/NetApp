@@ -48,7 +48,8 @@ public class ApiErrorHandler
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 default:
-                    _logger.LogError(error.Message, error);
+                    _logger.LogError(error.ToString());
+                    
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     if (string.IsNullOrWhiteSpace(responseModel.Message))
                     {

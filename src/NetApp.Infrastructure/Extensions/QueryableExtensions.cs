@@ -1,24 +1,22 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace NetApp.Infrastructure;
 public static class QueryableExtensions
 {
-    public static async Task<PaginatedResponse<TDto>> ToPaginatedResponse<T, TDto>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
-    {
-        CheckPageNumberAndSize(ref pageNumber, ref pageSize);
-        var totalItems = await source.CountAsync(cancellationToken);
-        if (totalItems == 0) return new PaginatedResponse<TDto>(Enumerable.Empty<TDto>(), 0, 0, 0);
+    //public static async Task<PaginatedResponse<TDto>> ToPaginatedResponse<T, TDto>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    //{
+    //    CheckPageNumberAndSize(ref pageNumber, ref pageSize);
+    //    var totalItems = await source.CountAsync(cancellationToken);
+    //    if (totalItems == 0) return new PaginatedResponse<TDto>(Enumerable.Empty<TDto>(), 0, 0, 0);
 
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<T, TDto>());
-        var mapper = config.CreateMapper();
-        var items = await source.Skip((pageNumber -1) * pageSize).Take(pageSize).ProjectTo<TDto>(mapper.ConfigurationProvider).ToListAsync(cancellationToken);
+    //    //var config = new MapperConfiguration(cfg => cfg.CreateMap<T, TDto>());
+    //    var mapper = config.CreateMapper();
+    //    var items = await source.Skip((pageNumber -1) * pageSize).Take(pageSize).ProjectTo<TDto>(mapper.ConfigurationProvider).ToListAsync(cancellationToken);
 
-        return new PaginatedResponse<TDto>(items, totalItems, pageSize, pageNumber);
-    }
+    //    return new PaginatedResponse<TDto>(items, totalItems, pageSize, pageNumber);
+    //}
 
-    public static async Task<PaginatedResponse<T>> ToPaginatedResponse<T>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public static async Task<PaginatedResponse<T>> ToPaginatedResponseAsync<T>(this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         CheckPageNumberAndSize(ref pageNumber, ref pageSize);
         var totalItems = await source.CountAsync(cancellationToken);

@@ -1,0 +1,92 @@
+﻿@using System.ComponentModel.DataAnnotations
+@attribute [Route(ApplicationConstants.Routes.UserProfile)]
+@page "/user-management/users/{UserId}"
+@inject IIdentityService IdentityService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject NetAppAuthStateProvider AuthStateProvider
+
+@if (user is not null)
+{
+    <MudGrid Justify="Justify.SpaceBetween">
+        <MudItem xs="12">
+            <MudPaper Class="d-flex  mud-width-full pa-6">
+                <MudImage
+                    Src="https://avatars.githubusercontent.com/u/77198295?s=400&u=32e73baef1b9672a18aa854b6b6cc37281e009c9&v=4"
+                    Height="160" Alt="@user.FullName" Class="rounded-lg" Elevation="25" />
+                <MudPaper Elevation="0" Class="mud-width-full pl-6">
+                    <MudText Typo="Typo.h4" GutterBottom="true">@user.FullName</MudText>
+                    <MudText Typo="Typo.body2">@user.Email</MudText>
+                </MudPaper>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader Class="mud-elevation-1">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Profile Details</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit">
+                            Edit
+                        </MudButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudSimpleTable Elevation="0">
+                        <tbody>
+                            <tr>
+                                <td>First Name</td>
+                                <td>@user.FirstName</td>
+                            </tr>
+                            <tr>
+                                <td>Last Name</td>
+                                <td>@user.LastName</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>@user.Email</td>
+                            </tr>
+                            <tr>
+                                <td>Two Factor</td>
+                                <td>@(user.TwoFactorEnabled ? "Enabled" : "Disabled") </td>
+                            </tr>
+                            @if (user.LastLoginOn is not null)
+                            {
+                                <tr>
+                                    <td>Last Login</td>
+                                    <td>@user.LastLoginOn.Value.GetTimeDifference()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+
+@code {
+
+    [Parameter] public string? UserId { get; set; }
+    private UserDto? user;
+    protected override async Task OnInitializedAsync()
+    {
+        UserId ??= await GetUserId();
+        user = await IdentityService.GetUserAsync(UserId!);
+        if (user is null)
+        {
+            Snackbar.Add("User not found", Severity.Error);
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task<string> GetUserId()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var id = authState.UserId();
+        return id;
+    }
+}

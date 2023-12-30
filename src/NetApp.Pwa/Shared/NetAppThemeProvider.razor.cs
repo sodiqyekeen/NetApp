@@ -37,9 +37,9 @@ public partial class NetAppThemeProvider
             TextDisabled = new MudBlazor.Utilities.MudColor("#A1A5B7"),
             LinesDefault = new MudBlazor.Utilities.MudColor("#eff2f5"),
             TextPrimary = new MudBlazor.Utilities.MudColor("#181C32"),
-            TextSecondary = new MudBlazor.Utilities.MudColor("#E4E6EF"),
             DrawerText = new MudBlazor.Utilities.MudColor("#FFFFFF"),
-            
+
+
         },
         PaletteDark = new PaletteDark
         {
@@ -66,10 +66,11 @@ public partial class NetAppThemeProvider
             DrawerText = new MudBlazor.Utilities.MudColor("#FFFFFF"),
             TextPrimary=new MudBlazor.Utilities.MudColor("#ffffffe0"),
             Surface=new MudBlazor.Utilities.MudColor("#1e1e2d"),
+            TextSecondary = new MudBlazor.Utilities.MudColor("#FFFFFF80"),
         },
         LayoutProperties = new LayoutProperties
         {
-            DrawerWidthLeft = "200px",
+            DrawerWidthLeft = "230px",
             AppbarHeight = "65px",
         },
         Typography = new Typography
@@ -112,8 +113,13 @@ public partial class NetAppThemeProvider
             },
             Body1 = new Body1
             {
-                FontSize = "1rem",
+                FontSize = "clamp(0.875rem, 2vw, 1rem)",
             },
+            Body2 = new Body2
+            {
+                FontSize = "clamp(0.75rem, 2vw, 0.875rem)"
+            }
+
         }
     };
 

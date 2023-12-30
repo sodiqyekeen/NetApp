@@ -1,0 +1,18 @@
+﻿@namespace NetApp.UI.Components
+@using Microsoft.AspNetCore.Components.Rendering
+@if (_dialogContext.References.Any())
+{
+    <CascadingValue TValue="BaseDialogContext" IsFixed="true" Value="@_dialogContext">
+        @_renderDialogs
+    </CascadingValue>
+}
+
+@code {
+    protected void RenderDialogs(RenderTreeBuilder __builder)
+    {
+        @foreach (DialogReference dialog in _dialogContext.References)
+        {
+             <NetAppDialog @key="@dialog" Id="@dialog.Id" Instance="@dialog.Instance" Data="@dialog.Instance.Content" @ondialogdismiss=OnDismissAsync />
+        }
+    }
+}

@@ -1,28 +1,21 @@
 using System.Security.Claims;
 using Fluxor;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Localization;
+using NetApp.Shared;
 using NetApp.UI.Infrastructure.Extensions;
 
 namespace NetApp.UI.Infrastructure.Services;
 
-internal class AuthenticationService : BaseService, IAuthenticationService
+internal class AuthenticationService(HttpClient httpClient,
+    AuthenticationStateProvider authenticationStateProvider,
+    IStorageService storageService, 
+    ISnackbar snackbar, 
+    IStringLocalizer<NetAppLocalizer> localizer) : BaseService(httpClient, snackbar, localizer), IAuthenticationService
 {
-    private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly IStorageService _storageService;
-    private readonly IDispatcher _dispatcher;
-    public AuthenticationService(HttpClient httpClient,
-        AuthenticationStateProvider authenticationStateProvider,
-        IStorageService storageService,
-        IDispatcher dispatcher) : base(httpClient)
-    {
-        _authenticationStateProvider = authenticationStateProvider;
-        _storageService = storageService;
-        _dispatcher = dispatcher;
-    }
-
     public async Task<ClaimsPrincipal> GetCurrentUser()
     {
-        var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
         return state.User;
     }
 
@@ -30,13 +23,13 @@ internal class AuthenticationService : BaseService, IAuthenticationService
     {
         var response = await PostAsync<AuthenticationRequest, AuthenticationResponse>(Endpoints.Identity.Login, request);
         if (!response.Succeeded) return response;
-        await ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyAuthenticatedAsync(response.Data!);
+        await ((NetAppAuthStateProvider)authenticationStateProvider).NotifyAuthenticatedAsync(response.Data!);
         return response;
     }
 
     public async Task LogoutAsync()
     {
-        await ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyLogoutAsync();
+        await ((NetAppAuthStateProvider)authenticationStateProvider).NotifyLogoutAsync();
     }
 
     public async Task TryRefreshToken(bool force = false)
@@ -49,7 +42,7 @@ internal class AuthenticationService : BaseService, IAuthenticationService
                 return;
             }
 
-            var currentAuthState = await ((NetAppAuthStateProvider)_authenticationStateProvider).GetAuthenticationStateAsync();
+            var currentAuthState = await ((NetAppAuthStateProvider)authenticationStateProvider).GetAuthenticationStateAsync();
             if (!currentAuthState.IsAnonymous() && currentAuthState.ShouldRefreshToken())
             {
                 //Console.WriteLine($" TryRefreshToken is called by: {(new System.Diagnostics.StackTrace())!.GetFrame(1)!.GetMethod()!.Module.Name}");
@@ -63,8 +56,8 @@ internal class AuthenticationService : BaseService, IAuthenticationService
     }
     private async Task RefreshToken()
     {
-        var refreshToken = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.RefreshToken);
-        var token = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
+        var refreshToken = await storageService.GetItemAsync<string>(ApplicationConstants.Storage.RefreshToken);
+        var token = await storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
         if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(token)) return;
         var request = new RefreshTokenRequest
         {
@@ -74,6 +67,6 @@ internal class AuthenticationService : BaseService, IAuthenticationService
         var response = await PostAsync<RefreshTokenRequest, AuthenticationResponse>(Endpoints.Identity.RefreshToken, request);
         if (!response!.Succeeded) return;
 
-        await ((NetAppAuthStateProvider)_authenticationStateProvider).NotifyAuthenticatedAsync(response!.Data!);
+        await ((NetAppAuthStateProvider)authenticationStateProvider).NotifyAuthenticatedAsync(response!.Data!);
     }
 }

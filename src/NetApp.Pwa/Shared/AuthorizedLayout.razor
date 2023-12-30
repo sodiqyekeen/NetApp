@@ -31,7 +31,7 @@
                     </MudCardHeader>
                 </MudCard>
                 <MudDivider Class="mb-2" />
-                <MudMenuItem>Profile</MudMenuItem>
+                <MudMenuItem Href="@ApplicationConstants.Routes.UserProfile">Profile</MudMenuItem>
                 <MudMenuItem>Settings</MudMenuItem>
                 <MudMenuItem OnClick="Logout">Sign Out</MudMenuItem>
             </ChildContent>
@@ -46,11 +46,13 @@
     </MudDrawer>
     <MudMainContent>
         <MudPaper Elevation="1" Class="top-bar">
-            <MudToolBar>
+           @*  <MudToolBar>
+                <MudText Typo="Typo.h1"></MudText> |
                 <NetAppBreadCrumb CurrentPage="@RoutingState.Value.Uri" />
                 <MudSpacer />
 
-            </MudToolBar>
+            </MudToolBar> *@
+            <NetAppTopBar CurrentUrl="@RoutingState.Value.Uri" />
         </MudPaper>
         <MudContainer MaxWidth="MaxWidth.Large" Class="pt-8">
             @ChildContent

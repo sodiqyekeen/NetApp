@@ -8,7 +8,7 @@ public static class Permissions
     [DisplayName("User"), Description("User Permissions")]
     public static class User
     {
-        [Description("Can view users.")] 
+        [Description("Can view users.")]
         public const string View = "Permissions.User.View";
 
         [Description("Can create users.")]
@@ -19,6 +19,9 @@ public static class Permissions
 
         [Description("Can delete users.")]
         public const string Delete = "Permissions.User.Delete";
+
+        [Description("Can manage user permission.")]
+        public const string ManagePermission = "Permissions.User.ManagePermission";
     }
 
     [DisplayName("Role"), Description("Role Permissions")]
@@ -41,7 +44,7 @@ public static class Permissions
     [DisplayName("RoleClaim"), Description("RoleClaim Permissions")]
     public static class RoleClaim
     {
-         [Description("Can view role claims.")]
+        [Description("Can view role claims.")]
         public const string View = "Permissions.RoleClaim.View";
 
         [Description("Can create role claims.")]

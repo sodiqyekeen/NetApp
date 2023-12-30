@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using NetApp.Domain.Common;
 
 namespace NetApp.Infrastructure.Identity.Models;
 
-public class NetAppRoleClaim : IdentityRoleClaim<string> //, IEntity<int>
+public class NetAppRoleClaim : IdentityRoleClaim<string>
 {
     public override int Id { get; set; }
-    public NetAppRole? Role { get; set; }
+    public NetAppRole Role { get; set; } = null!;
 }

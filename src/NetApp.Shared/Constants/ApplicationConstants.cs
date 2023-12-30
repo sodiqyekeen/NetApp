@@ -9,5 +9,6 @@ public static class SharedConstants
     public static class CustomClaimTypes
     {
         public const string Permission = "Permission";
+        public const string SessionId = "SessionId";
     }
 }

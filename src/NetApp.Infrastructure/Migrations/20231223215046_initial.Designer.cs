@@ -11,14 +11,14 @@ using NetApp.Infrastructure.Contexts;
 namespace NetApp.Infrastructure.Migrations
 {
     [DbContext(typeof(NetAppDbContext))]
-    [Migration("20230812141353_initial-setup")]
-    partial class initialsetup
+    [Migration("20231223215046_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
@@ -136,6 +136,81 @@ namespace NetApp.Infrastructure.Migrations
                     b.ToTable("AuditTrails");
                 });
 
+            modelBuilder.Entity("NetApp.Domain.Entities.EmailTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailTemplate", (string)null);
+                });
+
+            modelBuilder.Entity("NetApp.Domain.Entities.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<short>("Category")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SigningKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ValidUntil")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("Session", (string)null);
+                });
+
             modelBuilder.Entity("NetApp.Infrastructure.Identity.Models.NetAppRole", b =>
                 {
                     b.Property<string>("Id")
@@ -232,10 +307,21 @@ namespace NetApp.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastLoginOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
@@ -252,6 +338,9 @@ namespace NetApp.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("OtherNames")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");
 
@@ -260,12 +349,6 @@ namespace NetApp.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("RefreshTokenExpiryTime")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
@@ -310,13 +393,13 @@ namespace NetApp.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppRole", null)
-                        .WithMany()
+                        .WithMany("UserRoless")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppUser", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -327,6 +410,15 @@ namespace NetApp.Infrastructure.Migrations
                     b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NetApp.Domain.Entities.Session", b =>
+                {
+                    b.HasOne("NetApp.Infrastructure.Identity.Models.NetAppUser", null)
+                        .WithMany("Sessions")
+                        .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -345,6 +437,15 @@ namespace NetApp.Infrastructure.Migrations
             modelBuilder.Entity("NetApp.Infrastructure.Identity.Models.NetAppRole", b =>
                 {
                     b.Navigation("RoleClaims");
+
+                    b.Navigation("UserRoless");
+                });
+
+            modelBuilder.Entity("NetApp.Infrastructure.Identity.Models.NetAppUser", b =>
+                {
+                    b.Navigation("Sessions");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

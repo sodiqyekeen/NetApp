@@ -1,5 +1,5 @@
 ﻿using System.Text;
-
+using NetApp.Infrastructure.Security;
 namespace NetApp.Tests.Extensions;
 
 public class StringExtensionsTests
@@ -8,8 +8,8 @@ public class StringExtensionsTests
     public void TestRandomTokenStringReturnsUniqueValues()
     {
         // Act 
-        var firstRandomTokenString = NetApp.Extensions.StringExtensions.RandomTokenString();
-        var secondRandomTokenString = NetApp.Extensions.StringExtensions.RandomTokenString();
+        var firstRandomTokenString = TokenProvider.RandomTokenString(40);
+        var secondRandomTokenString = TokenProvider.RandomTokenString(40);
 
         // Assert
         Assert.NotEqual(firstRandomTokenString, secondRandomTokenString);
@@ -24,7 +24,7 @@ public class StringExtensionsTests
     public void TestGenerateRandomNumberReturnsValuesWithCorrectPatter(int length)
     {
         // Act
-        string result = NetApp.Extensions.StringExtensions.GenerateRandomNumber(length);
+        string result = TokenProvider.RandomNumber(length);
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Length == length);

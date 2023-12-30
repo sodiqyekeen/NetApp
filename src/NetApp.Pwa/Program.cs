@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using NetApp.Pwa;
 using MudBlazor.Services;
+using NetApp.Pwa;
 using NetApp.UI.Infrastructure;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
@@ -17,8 +17,12 @@ builder.Services.AddMudServices();
 builder.Services.AddTransient<AuthenticationHeaderHandler>()
     .AddScoped(sp => sp
         .GetRequiredService<IHttpClientFactory>()
-        .CreateClient("NetApp.Pwa").EnableIntercept(sp))
-    .AddHttpClient("NetApp.Pwa", client => client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] + "/api/"))
+        .CreateClient("NetApp.UI.Pwa").EnableIntercept(sp))
+    .AddHttpClient("NetApp.UI.Pwa", client =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] + "/api/");
+        client.Timeout = TimeSpan.FromSeconds(60);
+    })
     .AddHttpMessageHandler<AuthenticationHeaderHandler>();
 builder.Services.AddHttpClientInterceptor();
 

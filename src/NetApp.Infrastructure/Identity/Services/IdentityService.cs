@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using NetApp.Domain.Constants;
 using NetApp.Domain.Entities;
+using NetApp.Domain.Enums;
 using NetApp.Domain.Exceptions;
 using NetApp.Domain.Models;
+using NetApp.Infrastructure.Security;
 using NetApp.Shared;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -97,10 +98,10 @@ internal class IdentityService : IIdentityService
         if (!user.EmailConfirmed)
             throw new ApiException($"Account not confirmed for '{request.Email}'.");
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        var tokenKey = StringExtensions.GenerateRandomNumber(6);
+        var tokenKey = TokenProvider.RandomNumber(6);
         var emailRequest = new EmailRequest(request.Email!,
-            _localizer["Reset Password"],
-            $"Kindly use this token <strong>{tokenKey}</strong> to reset your password. The token is valid for <strong>5 mintues</strong>.");
+            DomainConstants.EmailTemplate.ResetPassword,
+            new { Token = tokenKey, Name = user.UserName });
         await _emailService.SendAsync(emailRequest);
         var authToken = new AuthenticationToken
         {
@@ -125,12 +126,24 @@ internal class IdentityService : IIdentityService
         var userPrincipal = GetPrincipalFromExpiredToken(request.Token);
         var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
         var user = await _userManager.FindByEmailAsync(userEmail!) ?? throw new NotFoundException(_localizer["User Not Found."]);
-        if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        var sessionId = userPrincipal.FindFirstValue(SharedConstants.CustomClaimTypes.SessionId) ?? throw new ApiException(_localizer["Invalid token"]);
+        var currentSession = await _repositoryProvider.SessionRepository.GetSessionByIdAsync(Guid.Parse(sessionId));
+        if (currentSession is null || currentSession.RefreshToken != request.RefreshToken || currentSession.RefreshTokenExpiryTime!.Value <= _dateTimeService.Now)
             throw new ApiException(_localizer["Invalid Client Token."]);
-
-        SetRefreshToken(user);
-        await _userManager.UpdateAsync(user);
-        return await GenerateAuthenticationResponse(user, ipAddress);
+        var session = new Session
+        {
+            Category = SessionCategory.RefreshToken,
+            ValidUntil = _dateTimeService.Now.AddMinutes(_jwtSettings.DurationInMinutes),
+            SigningKey = TokenProvider.SigningKey(),
+            RefreshToken = TokenProvider.RefreshToken(),
+            RefreshTokenExpiryTime = _dateTimeService.Now.AddDays(1),
+            CreatedBy = user.Id!,
+            IpAddress = ipAddress
+        };
+        await _repositoryProvider.SessionRepository.AddSessionAsync(session);
+        _repositoryProvider.SessionRepository.DeleteSession(currentSession);
+        await _repositoryProvider.SaveChangesAsync();
+        return await GenerateAuthenticationResponse(user, session);
     }
 
     public async Task<IResponse<UserRolesResponse>> GetRolesAsync(string userId)
@@ -146,20 +159,18 @@ internal class IdentityService : IIdentityService
         return Response<UserRolesResponse>.Success(new UserRolesResponse(user.Id, viewModel));
     }
 
-    public async Task<IResponse<PaginatedResponse<User>>> GetUsersAsync(PagingOptions pagingOptions, CancellationToken cancellationToken)
+    public async Task<IResponse<PaginatedResponse<UserDto>>> GetUsersAsync(PagingOptions pagingOptions, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        var superAdmin = (await _userManager.GetUsersInRoleAsync(DomainConstants.Role.SuperAdmin)).Select(u => u.Id).FirstOrDefault();
-        var users = new List<User>();
+        if (cancellationToken.IsCancellationRequested)
+            return Response<PaginatedResponse<UserDto>>.Fail(_localizer["Request cancelled."]);
         var usersQuery = _userManager.Users.AsQueryable();
+#if !DEBUG
+        var superAdmin = (await _userManager.GetUsersInRoleAsync(DomainConstants.Role.SuperAdmin)).Select(u => u.Id).FirstOrDefault();
         usersQuery = usersQuery.Where(u => u.Id != superAdmin);
-        var paginatedList = await usersQuery.ToPaginatedResponse(pagingOptions.PageIndex!.Value, pagingOptions.PageSize!.Value, cancellationToken);
-        foreach (var user in paginatedList.Data)
-        {
-            var userRoles = await _userManager.GetRolesAsync(user);
-            users.Add(new User(user.Id, user.UserName!, user.Email!, [.. userRoles], user.Active));
-        }
-        return Response<PaginatedResponse<User>>.Success(new PaginatedResponse<User>(users, paginatedList.TotalItems, paginatedList.PageSize, paginatedList.PageNumber));
+#endif
+        var paginatedList = await usersQuery.ProjectToUserDto().ToPaginatedResponseAsync(pagingOptions.PageIndex!.Value, pagingOptions.PageSize!.Value, cancellationToken);
+
+        return Response<PaginatedResponse<UserDto>>.Success(paginatedList);
     }
 
     public async Task<IResponse<AuthenticationResponse>> LoginAsync(AuthenticationRequest request, string ipAddress)
@@ -176,10 +187,21 @@ internal class IdentityService : IIdentityService
         if (!user.EmailConfirmed)
             throw new ApiException(_localizer[$"Account not confirmed for '{request.Email}'."]);
 
-        SetRefreshToken(user);
-
+        var session = new Session
+        {
+            Category = SessionCategory.Login,
+            ValidUntil = _dateTimeService.Now.AddMinutes(_jwtSettings.DurationInMinutes),
+            SigningKey = TokenProvider.SigningKey(),
+            RefreshToken = TokenProvider.RefreshToken(),
+            RefreshTokenExpiryTime = _dateTimeService.Now.AddDays(1),
+            CreatedBy = user.Id!,
+            IpAddress = ipAddress
+        };
+        await _repositoryProvider.SessionRepository.AddSessionAsync(session);
+        user.LastLoginOn = _dateTimeService.Now;
         await _userManager.UpdateAsync(user);
-        return await GenerateAuthenticationResponse(user, ipAddress);
+        await _repositoryProvider.SaveChangesAsync();
+        return await GenerateAuthenticationResponse(user, session);
     }
 
     public async Task<IResponse<string>> RegisterAsync(RegisterRequest request, string origin)
@@ -192,19 +214,18 @@ internal class IdentityService : IIdentityService
             Email = request.Email,
             UserName = request.Username
         };
-        var password = StringExtensions.GeneratePassword();
-        var result = await _userManager.CreateAsync(user, password);
+
+        var result = await _userManager.CreateAsync(user, TokenProvider.Password());
         if (!result.Succeeded)
             throw new ApiException($"{result.Errors.First().Description}");
         await _userManager.AddToRoleAsync(user, DomainConstants.Role.Basic);
-        await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.NameIdentifier, user.Id));
-        await _userManager.AddClaimAsync(user, new Claim("username", user.UserName!));
+
         var verificationLink = await GenerateVerificationEmailLink(user, origin);
         try
         {
-            string mailBody = $"<p>Dear {user.UserName},</p> <br/> <p>Your account has been created successfully.</p> <p>To login, use your email address and password: <strong>{password}</strong>.</p>" +
-                            $" <br/> <p>Please click this <a href=\"{verificationLink}\" target=\"_blank\" >link</a> to confirm your account.</p>";
-            await _emailService.SendAsync(new EmailRequest(user.Email!, _localizer["Confirm Registration"], mailBody));
+            //string mailBody = $"<p>Dear {user.UserName},</p> <br/> <p>Your account has been created successfully.</p> <p>To login, use your email address and password: <strong>{password}</strong>.</p>" +
+            //                $" <br/> <p>Please click this <a href=\"{verificationLink}\" target=\"_blank\" >link</a> to confirm your account.</p>";
+            await _emailService.SendAsync(new EmailRequest(user.Email!, DomainConstants.EmailTemplate.ConfirmEmail, new { Name = user.UserName, Link = verificationLink }));
         }
         catch (InvalidEmailAddressException)
         {
@@ -218,8 +239,8 @@ internal class IdentityService : IIdentityService
     {
         var user = await _userManager.FindByIdAsync(request.UserId) ?? throw new NotFoundException(_localizer["User not found."]);
         var verificationLink = await GenerateVerificationEmailLink(user, ipAddress);
-        string mailBody = $"<p>Please click this <a href=\"{verificationLink}\" target=\"_blank\" >link</a> to confirm your account.</p>";
-        await _emailService.SendAsync(new EmailRequest(user.Email!, _localizer["Confirm Registration"], mailBody));
+        //string mailBody = $"<p>Please click this <a href=\"{verificationLink}\" target=\"_blank\" >link</a> to confirm your account.</p>";
+        await _emailService.SendAsync(new EmailRequest(user.Email!, DomainConstants.EmailTemplate.ConfirmEmail, new { Name = user.UserName, Link = verificationLink }));
     }
 
     public async Task<IResponse> ResetPasswordAsync(ResetPasswordRequest request)
@@ -324,13 +345,8 @@ internal class IdentityService : IIdentityService
     private static bool IsValidToken(SecurityToken securityToken) =>
         securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.OrdinalIgnoreCase);
 
-    private void SetRefreshToken(NetAppUser user)
-    {
-        user.RefreshToken = StringExtensions.RandomTokenString();
-        user.RefreshTokenExpiryTime = _dateTimeService.Now.AddDays(1);
-    }
 
-    private async Task<string> GenerateJWToken(NetAppUser user, IEnumerable<string> roles, string ipAddress)
+    private async Task<string> GenerateJWToken(NetAppUser user, IEnumerable<string> roles, Session session)
     {
         var userClaims = await _userManager.GetClaimsAsync(user);
         var roleClaims = new List<Claim>();
@@ -345,31 +361,33 @@ internal class IdentityService : IIdentityService
 
         var claims = new[]
         {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Email, user.Email!),
             new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim("ip", ipAddress),
+            new Claim(ClaimTypes.Dns, session.IpAddress),
+            new Claim(SharedConstants.CustomClaimTypes.SessionId, session.Id.ToString())
          }
         .Union(userClaims)
         .Union(roleClaims)
         .Union(permissionClaims);
 
-        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(session.SigningKey!));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
         var jwtSecurityToken = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: claims,
-            expires: _dateTimeService.Now.AddMinutes(_jwtSettings.DurationInMinutes),
+            expires: session.ValidUntil,
             signingCredentials: signingCredentials);
         return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
     }
 
-    private async Task<IResponse<AuthenticationResponse>> GenerateAuthenticationResponse(NetAppUser user, string ipAddress)
+    private async Task<IResponse<AuthenticationResponse>> GenerateAuthenticationResponse(NetAppUser user, Session session)
     {
         var rolesList = await _userManager.GetRolesAsync(user);
-        var jwtSecurityToken = await GenerateJWToken(user, rolesList, ipAddress);
-        AuthenticationResponse response = new(jwtSecurityToken, user.RefreshToken!);
+        var jwtSecurityToken = await GenerateJWToken(user, rolesList, session);
+        AuthenticationResponse response = new(jwtSecurityToken, session.RefreshToken!);
         return Response<AuthenticationResponse>.Success(response, _localizer[$"Authenticated {user.UserName}"]);
     }
 
@@ -378,7 +396,7 @@ internal class IdentityService : IIdentityService
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         await _repositoryProvider.AuthenticationTokenRepository.AddTokenAsync(new AuthenticationToken
         {
-            Key = StringExtensions.GenerateRandomNumber(9),
+            Key = TokenProvider.RandomNumber(9),
             Value = code,
             Expires = _dateTimeService.Now.AddMinutes(30)
         });
@@ -391,4 +409,9 @@ internal class IdentityService : IIdentityService
         return verificationUri;
     }
 
+    public async Task<IResponse<UserDto>> GetUser(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id) ?? throw new NotFoundException(_localizer["User not found."]);
+        return Response<UserDto>.Success(user.ToUserDto());
+    }
 }

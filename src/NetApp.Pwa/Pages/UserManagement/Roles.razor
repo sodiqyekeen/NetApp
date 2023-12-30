@@ -1,0 +1,67 @@
+﻿@namespace NetApp.Pwa.Pages
+@attribute [Route(ApplicationConstants.Routes.Roles)]
+<MudGrid>
+    <MudItem md="3">
+        <MudPaper Elevation="0" Height="100%" Class="pa-4 pt-6">
+            <MudStack Style="height:100% !important" Justify="Justify.SpaceBetween">
+                <div>
+                    <MudText Typo="Typo.h6">Administrator</MudText>
+                    <MudText Class="mt-4" Typo="Typo.body2"> Total users with this role: 5 </MudText>
+                </div>
+                <div class="pt-4 pl-2">
+                    <ul>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create users</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create roles</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create permissions</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">and 7 more...</MudText></li>
+                    </ul>
+                </div>
+                <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
+                    <MudButton Variant="Variant.Filled" Class="ml-2">View</MudButton>
+                    <MudButton Variant="Variant.Filled" Class="ml-2">Edit</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem md="3">
+        <MudPaper Elevation="0" Height="100%" Class="pa-4 pt-6">
+            <MudStack Style="height:100% !important" Justify="Justify.SpaceBetween">
+                <div>
+                <MudText Typo="Typo.h6">Supervisor</MudText>
+                <MudText Typo="Typo.body2" Class="mt-4">
+                    Total users with this role: 5
+                </MudText>
+                </div>
+                <div class="pt-4 pl-2">
+                    <ul>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create users</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create roles</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create permissions</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
+                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">and 7 more...</MudText></li>
+                    </ul>
+                </div>
+                <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
+                    <MudButton Variant="Variant.Filled" Class="ml-2">View</MudButton>
+                    <MudButton Variant="Variant.Filled" Class="ml-2">Edit</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem md="3">
+        <MudPaper Elevation="0" Height="100%" Class="pa-6 ">
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="6" Style="height:100% !important">
+                <MudIcon Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="width:150px; height:150px;"></MudIcon>
+                <MudText Typo="Typo.h6">Add Role</MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+</MudGrid>
+
+@code {
+
+}

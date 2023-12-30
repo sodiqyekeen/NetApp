@@ -1,0 +1,51 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using NetApp.Extensions
+@layout UnauthorizedLayout
+@attribute [Route(ApplicationConstants.Routes.ConfirmOtp)]
+@attribute [AllowAnonymous]
+@inject IJSRuntime JsRuntime
+@inject ISnackbar Snackbar
+@implements IAsyncDisposable
+
+<MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">Two Step Verification</MudText>
+<MudText Typo="Typo.body2" Align="Align.Center">Enter the code sent to your email address</MudText>
+<MudPaper Elevation="0" Class="mt-8 px-2">
+    <EditForm Model="OtpForm" OnSubmit="SubmitOtpForm">
+    <MudStack Spacing="4">
+        <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+            <MudStack Row="true" Spacing="4">
+                <MudTextField T="int?" @bind-Value="OtpForm.Code1" Variant="Variant.Outlined" Mask="@(new PatternMask("0"))" id="code1"></MudTextField>
+                <MudTextField T="int?" @bind-Value="OtpForm.Code2" Variant="Variant.Outlined" Mask="@(new PatternMask("0"))" id="code2"></MudTextField>
+                <MudTextField T="int?" @bind-Value="OtpForm.Code3" Variant="Variant.Outlined" Mask="@(new PatternMask("0"))" id="code3"></MudTextField>
+                <MudTextField T="int?" @bind-Value="OtpForm.Code4" Variant="Variant.Outlined" Mask="@(new PatternMask("0"))" id="code4"></MudTextField>
+                <MudTextField T="int?" @bind-Value="OtpForm.Code5" Variant="Variant.Outlined" Mask="@(new PatternMask("0"))" id="code5"></MudTextField>
+                <MudTextField T="int?" @bind-Value="OtpForm.Code6" Variant="Variant.Outlined" Mask="@(new PatternMask("0"))" id="code6"></MudTextField>
+            </MudStack>
+        </MudFocusTrap>
+        <div class="mt-4 d-flex justify-center">
+            <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary">Submit</MudButton>
+        </div>
+    </MudStack>
+    </EditForm>
+</MudPaper>
+
+@code {
+    public OtpValidationForm OtpForm { get; set; } = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JsRuntime.InvokeVoidAsync("window.registerOtpFormFocusHanlder");
+    }
+
+
+    private async void SubmitOtpForm()
+    {
+
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("window.unregisterOtpFormFocusHanlder");
+    }
+
+}

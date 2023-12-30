@@ -1,16 +1,12 @@
-﻿<MudNavMenu Class="mud-width-full my-2">
-    <MudNavLink Href="@ApplicationConstants.Routes.Dashboard" Icon="@Icons.Material.Outlined.Dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+﻿<MudNavMenu Rounded="true" Margin="Margin.Dense" Class="mud-width-full my-2">
+    <MudNavLink Href="@ApplicationConstants.Routes.Dashboard" Icon="@Icons.Material.Outlined.Dashboard" Match="NavLinkMatch.All">Dashboard</MudNavLink>
     <MudNavLink Href="counter" Icon="@Icons.Material.Outlined.Add">Counter</MudNavLink>
     <MudNavLink Href="fetchdata" Icon="@Icons.Material.Outlined.List">Fetch Data</MudNavLink>
 
-    <MudNavGroup Title="Level 0" Icon="@Icons.Material.Filled.Settings">
-        <MudNavGroup Title="Level 1" Icon="@Icons.Material.Filled.AdminPanelSettings">
-            <MudNavGroup Title="Level 2" Icon="@Icons.Material.Filled.People">
-                <MudNavGroup Title="Level 3" Icon="@Icons.Material.Filled.Lock">
-                    <MudNavLink Href="/delete" Icon="@Icons.Material.Filled.DeleteForever">Delete Password</MudNavLink>
-                </MudNavGroup>
-            </MudNavGroup>
-        </MudNavGroup>
+    <MudNavGroup Title="User Management" Icon="@Icons.Material.Filled.AdminPanelSettings">
+        <MudNavLink Href="@ApplicationConstants.Routes.Users" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+        <MudNavLink Href="@ApplicationConstants.Routes.Roles" Icon="@Icons.Material.Filled.PeopleAlt">Roles</MudNavLink>
+        <MudNavLink Href="@ApplicationConstants.Routes.Permissions" Icon="@Icons.Material.Filled.People">Permissions</MudNavLink>
     </MudNavGroup>
     <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
 </MudNavMenu>

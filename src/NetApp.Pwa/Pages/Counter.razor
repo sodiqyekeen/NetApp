@@ -5,8 +5,6 @@
 @inject IState<NetAppState> AppState
 @inject IDispatcher Dispatcher
 
-<PageTitle>Counter</PageTitle>
-
 <MudText Typo="Typo.h3" GutterBottom="true">Counter</MudText>
 <MudText Class="mb-4">Current count: @AppState.Value.Count</MudText>
 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="IncrementCount">Click me</MudButton>

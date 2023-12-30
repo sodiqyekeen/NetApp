@@ -1,0 +1,39 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime Js
+@* <div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4 auth">
+            <LoginDisplay />
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+ *@
+
+ <div class="antialiased bg-gray-50 dark:bg-gray-900">
+   <Header />
+    <!-- Sidebar -->
+    <SideBar />
+    <main class="p-4 md:ml-64 h-auto pt-20">
+     @Body
+    </main>
+  </div>
+  <NetAppDialogProvider />
+
+@code{
+    protected override async Task OnAfterRenderAsync(bool isFirstRender){
+        if(isFirstRender)
+        {
+           await Js.InvokeVoidAsync("window.initialiseFlowbite");
+        }
+    }
+ }

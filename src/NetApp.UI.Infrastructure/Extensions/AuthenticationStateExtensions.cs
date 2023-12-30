@@ -12,15 +12,15 @@ public static class AuthenticationStateExtensions
     public static string UserEmail(this AuthenticationState authenticationState) =>
         authenticationState.User.FindFirst(ClaimTypes.Email)?.Value ?? "";
 
+    public static string UserId(this AuthenticationState authenticationState) =>
+        authenticationState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+
     public static bool IsAnonymous(this AuthenticationState authenticationState) =>
        authenticationState == Anonymous;
 
     public static bool IsTokenExpired(this AuthenticationState currentAuthState)
     {
         TimeSpan timeDiff = GetTokenExpiration(currentAuthState);
-#if DEBUG
-        Console.WriteLine($"Token expires in {timeDiff.Minutes} minutes");
-#endif
         return timeDiff.Seconds < 10;
     }
 

@@ -1,35 +1,28 @@
-﻿@attribute [Route(ApplicationConstants.Routes.Login)]
+﻿@layout UnauthorizedLayout
+@attribute [Route(ApplicationConstants.Routes.Login)]
 @attribute [AllowAnonymous]
 
-<MudPaper Elevation="6" Class="pa-6">
 
-    <MudText Typo="Typo.h3" Align="Align.Center">Sign In</MudText>
-    <MudPaper Elevation="0" Class="px-4 pt-4">
-        <EditForm Model="loginModel" OnValidSubmit="LoginAsync" class="mt-4">
-            <DataAnnotationsValidator />
-            <MudTextField Class="my-6"
-                          Variant="Variant.Outlined"
-                          T="string"
-                          Label="E-mail"
-                          @bind-Value="loginModel.Email"
-                          For="@(() => loginModel.Email)"
-                          autocomplete="off" />
-            <MudTextField Label="Password"
-                          Variant="Variant.Outlined"
-                          @bind-Value="loginModel.Password"
-                          For="@(() => loginModel.Password)"
-                          InputType="@passwordInputType"
-                          Adornment="Adornment.End"
-                          AdornmentIcon="@passwordInputIcon"
-                          OnAdornmentClick="TogglePasswordVisibility"
-                          autocomplete="off" />
-            <div class="d-flex justify-space-between mt-3">
-                <MudCheckBox Label="Remember me" @bind-Checked="loginModel.RememberMe" />
-                <MudLink Class="align-self-center" Href="@(ApplicationConstants.Routes.ForgotPassword)"><small>Forgot Password?</small></MudLink>
-            </div>
+<MudText Typo="Typo.h3" Align="Align.Center">Sign In</MudText>
+<MudPaper Elevation="0" Class="px-4 pt-4">
+    <EditForm Model="loginModel" OnValidSubmit="LoginAsync" class="mt-4">
+        <DataAnnotationsValidator />
+        <MudTextField Class="my-6"
+                      Variant="Variant.Outlined"
+                      T="string"
+                      Label="E-mail"
+                      @bind-Value="loginModel.Email"
+                      For="@(() => loginModel.Email)"
+                      autocomplete="off" />
+        <PasswordTextField Label="Password"
+                           @bind-Value="loginModel.Password"
+                           For="@(() => loginModel.Password)" />
 
-            <MudButton Class="my-4" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth="true">Sign In</MudButton>
-        </EditForm>
-    </MudPaper>
+        <div class="d-flex justify-space-between mt-3">
+            <MudCheckBox Label="Remember me" @bind-Checked="loginModel.RememberMe" />
+            <MudLink Class="align-self-center" Href="@(ApplicationConstants.Routes.ConfirmOtp)"><small>Forgot Password?</small></MudLink>
+        </div>
 
+        <MudButton Class="my-4" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" FullWidth="true">Sign In</MudButton>
+    </EditForm>
 </MudPaper>

@@ -1,6 +1,9 @@
 
+@inherits LayoutComponentBase
 <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
     <div class="auth-container">
-        @ChildContent
+        <MudPaper Elevation="6" Class="px-6 py-12">
+            @Body
+        </MudPaper>
     </div>
 </div>

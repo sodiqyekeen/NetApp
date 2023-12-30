@@ -1,3 +1,4 @@
+@using System.Text
 @inject NavigationManager NavigationManager
 <MudBreadcrumbs Items="_items" Separator=">"></MudBreadcrumbs>
 
@@ -9,53 +10,33 @@
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>();
 
-    private static Dictionary<string, string> BreadCrumbLabels = new()
-    {
-        {"counter", "Counter"},
-        {"fetchdata", "Fetch Data"},
-        {"login", "Login"},
-        {"logout", "Logout"},
-        {"register", "Register"},
-        {"profile", "Profile"},
-        {"user", "User"},
-        {"users", "Users"},
-        {"roles", "Roles"},
-        {"role", "Role"},
-        {"permissions", "Permissions"},
-        {"permission", "Permission"},
-        {"claims", "Claims"},
-        {"claim", "Claim"},
-        {"error", "Error"},
-        {"forbidden", "Forbidden"},
-        {"notfound", "Not Found"},
-        {"unauthorized", "Unauthorized"},
-        {"servererror", "Server Error"},
-        {"badrequest", "Bad Request"},
-        {"about", "About"},
-        {"contact", "Contact"},
-        {"privacy", "Privacy"},
-        {"terms", "Terms"},
-        {"home", "Home"},
-        {"Dashboard", "Home"},
-    };
 
     protected override void OnParametersSet()
     {
-        Console.WriteLine(CurrentPage);
         _items = new List<BreadcrumbItem>();
-        var path = CurrentPage.Replace(NavigationManager.BaseUri, "");
+        var path = NavigationManager.ToBaseRelativePath(CurrentPage);
         var urlParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (urlParts.Length > 0 && !urlParts[0].Equals("dashboard", StringComparison.OrdinalIgnoreCase))
-            _items.Add(new BreadcrumbItem("Home", $"{NavigationManager.BaseUri}dashboard"));
+        if (urlParts.Length > 0)
+            _items.Add(new BreadcrumbItem("Home", NavigationManager.BaseUri));
 
-        var routeUrl = "";
-        foreach (var item in urlParts)
+        var currentUrl = new StringBuilder();
+        for (int i = 0; i < urlParts.Length; i++)
         {
-            if (BreadCrumbLabels.TryGetValue(item, out var label))
-            {
-                routeUrl += "/" + item;
-                _items.Add(new BreadcrumbItem(label, path));
-            }
+            var item = urlParts[i];
+            if (currentUrl.Length >0)
+                currentUrl.Append("/"+item);
+            else
+                currentUrl.Append(item);
+
+            var breadCrumb = GetBreadcrumb(item, currentUrl.ToString(), isLastItem: i == urlParts.Length - 1);
+            if (breadCrumb is null) continue;
+            _items.Add(breadCrumb);
         }
+    }
+
+    private static BreadcrumbItem? GetBreadcrumb(string path, string currentUri, bool isLastItem)
+    {
+        if (!ApplicationConstants.BreadCrumbLabelsAndLinks.TryGetValue(path, out var value)) return null;
+        return new BreadcrumbItem(value.label, currentUri, disabled: isLastItem ? true : !value.valid);
     }
 }

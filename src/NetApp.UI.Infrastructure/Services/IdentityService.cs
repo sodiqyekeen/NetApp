@@ -1,12 +1,10 @@
-﻿using System.Net.Http.Json;
+﻿using Microsoft.Extensions.Localization;
+using NetApp.Shared;
+using System.Net.Http.Json;
 
 namespace NetApp.UI.Infrastructure.Services;
-public class IdentityService : BaseService, IIdentityService
+public class IdentityService(HttpClient httpClient, ISnackbar snackbar, IStringLocalizer<NetAppLocalizer> localizer) : BaseService(httpClient, snackbar, localizer), IIdentityService
 {
-    public IdentityService(HttpClient httpClient) : base(httpClient)
-    {
-    }
-
     public async Task<IResponse> ConfirmEmailAsync(string userId, string code)
     {
         var response = await _httpClient.PostAsync(Endpoints.Identity.ConfirmEmail(userId, code), null);
@@ -25,14 +23,14 @@ public class IdentityService : BaseService, IIdentityService
 
     public async Task<IResponse<UserRolesResponse>> GetRolesAsync(string userId, CancellationToken cancellation)
     {
-        return await GetAsync<IResponse<UserRolesResponse>>(Endpoints.Identity.UserRoles(userId), cancellation);
+        return await GetAsync<Response<UserRolesResponse>>(Endpoints.Identity.UserRoles(userId), cancellation);
     }
 
-    public async Task<PaginatedResponse<User>> GetUsersAsync(TableState state, string? searchString, CancellationToken cancellationToken)
-    {
-        var response = await GetAsync<IResponse<PaginatedResponse<User>>>(Endpoints.Identity.Users, cancellationToken);
-        return response!.Data!;
-    }
+    public async Task<UserDto?> GetUserAsync(string id) =>
+    await GetAsync<UserDto>(Endpoints.Identity.UserById(id));
+
+    public async Task<PaginatedResponse<UserDto>> GetUsersAsync(TableState state, string? searchString, CancellationToken cancellationToken) =>
+    await GetAsync<PaginatedResponse<UserDto>>(Endpoints.Identity.Users, cancellationToken);
 
     public async Task<IResponse<string>> RegisterUserAsync(RegisterRequest request)
     {
@@ -49,7 +47,7 @@ public class IdentityService : BaseService, IIdentityService
         return await PostAsync(Endpoints.Identity.ResetPassword(userId), request);
     }
 
-    public async Task<IResponse> UpdatePasswordAsync(string userId,UpdatePasswordRequest request)
+    public async Task<IResponse> UpdatePasswordAsync(string userId, UpdatePasswordRequest request)
     {
         return await PutAsync(Endpoints.Identity.UpdatePassword(userId), request);
     }
@@ -63,4 +61,6 @@ public class IdentityService : BaseService, IIdentityService
     {
         return await PutAsync(Endpoints.Identity.UserRoles(userId), request);
     }
+
+
 }

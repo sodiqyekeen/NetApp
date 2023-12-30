@@ -10,16 +10,15 @@ public class NetAppRole : IdentityRole, IAuditableEntity<string>
     public DateTime CreatedOn { get; set; }
     public string? LastModifiedBy { get; set; }
     public DateTime? LastModifiedOn { get; set; }
-    public ICollection<NetAppRoleClaim> RoleClaims { get; set; }
+    public ICollection<NetAppRoleClaim> RoleClaims { get; set; } = new HashSet<NetAppRoleClaim>();
+    public ICollection<IdentityUserRole<string>> UserRoless { get; set; } = new HashSet<IdentityUserRole<string>>();
 
     public NetAppRole() : base()
     {
-        RoleClaims = new HashSet<NetAppRoleClaim>();
     }
 
     public NetAppRole(string roleName, string roleDescription) : base(roleName)
     {
-        RoleClaims = new HashSet<NetAppRoleClaim>();
         Description = roleDescription;
     }
 

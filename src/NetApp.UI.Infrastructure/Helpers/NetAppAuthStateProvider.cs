@@ -26,9 +26,9 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
         var token = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
         if (string.IsNullOrWhiteSpace(token))
             return AuthenticationStateExtensions.Anonymous;
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(GetClaims(token), "jwt"));
+        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(StringExtensions.GetClaims(token), "jwt"));
         var authenticationState = new AuthenticationState(claimsPrincipal);
-        if(authenticationState.IsTokenExpired())
+        if (authenticationState.IsTokenExpired())
             return AuthenticationStateExtensions.Anonymous;
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         return authenticationState;
@@ -47,14 +47,7 @@ public class NetAppAuthStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(Task.FromResult(AuthenticationStateExtensions.Anonymous));
     }
 
-    private static List<Claim> GetClaims(string jwtToken)
-    {
-        string payload = jwtToken.Split(".")[1];
-        byte[] jsonBytes = payload.ParseBase64StringWithoutPadding();
-        var keyValuePairs = jsonBytes.FromBytes<Dictionary<string, object>>();
-        var claims = keyValuePairs!.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()!)).ToList();
-        return claims;
-    }
+
 
 
 

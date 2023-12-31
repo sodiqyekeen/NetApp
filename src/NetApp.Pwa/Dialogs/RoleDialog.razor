@@ -1,0 +1,77 @@
+@inherits DialogBase
+@inject IRoleService RoleService
+@inject IStringLocalizer<NetAppLocalizer> localizer
+
+<EditForm Model="@request">
+    <MudDialog Class="pa-4">
+        <TitleContent>
+            @{
+                if (request.Id == null)
+                {
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+                        Add Role
+                    </MudText>
+                }
+                else
+                {
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+                        Update Role
+                    </MudText>
+                }
+            }
+        </TitleContent>
+        <DialogContent>
+            <MudTextField For="@(() => request.Name)" @bind-Value="request.Name" Label="Role Name" />
+            <MudTextField For="@(() => request.Description)" @bind-Value="request.Description" Label="Description" />
+        </DialogContent>
+        <DialogActions>
+            <MudButton Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+            @{
+                if (request.Id == null)
+                {
+                    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary">Save Role
+                    </MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Color="Color.Primary">Update Role
+                    </MudButton>
+                }
+            }
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+
+@code {
+    [Parameter] public string? RoleId { get; set; }
+
+    private RoleRequest request = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (RoleId != null)
+        {
+            Dispatcher.ToggleLoader(true);
+            var role = await RoleService.GetByIdAsync(RoleId);
+            if (role == null)
+            {
+                Dispatcher.ToggleLoader(false);
+                Snackbar.Add(localizer["Role not found."], Severity.Error);
+                Cancel();
+            }
+            else
+            {
+                request = new RoleRequest
+                    {
+                        Name = role.Name,
+                        Description = role.Description,
+                        Id = role.Id
+                    };
+                Dispatcher.ToggleLoader(false);
+            }
+        }
+    }
+}

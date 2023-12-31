@@ -1,19 +1,17 @@
 <AuthorizeView>
     <MudAppBar Elevation="0" Class="pr-8">
-        <MudIconButton Class="d-flex d-md-none"
-                       Icon="@Icons.Material.Filled.Menu"
-                       Color="Color.Inherit"
-                       Edge="Edge.Start"
-                       OnClick="ToggleDrawer" />
+        <MudIconButton Class="d-flex d-md-none" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"
+            Edge="Edge.Start" OnClick="ToggleDrawer" />
         <MudSpacer />
         <MudIconButton Icon="@Icons.Material.Outlined.Search" Color="Color.Inherit" />
-        <MudIconButton Icon="@Icons.Material.Outlined.Notifications"
-                       Color="Color.Inherit" />
-        <MudSwitch T="bool" Checked="AppState.Value.IsDarkMode" CheckedChanged="ToggleTheme" Color="Color.Inherit" ThumbIcon="@(AppState.Value.IsDarkMode==true ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)"></MudSwitch>
+        <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="Color.Inherit" />
+        <MudSwitch T="bool" Checked="AppState.Value.IsDarkMode" CheckedChanged="ToggleTheme" Color="Color.Inherit"
+            ThumbIcon="@(AppState.Value.IsDarkMode==true ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)">
+        </MudSwitch>
         <MudMenu ActivationEvent="@MouseEvent.LeftClick" AnchorOrigin="@Origin.BottomLeft" Color="Color.Inherit">
             <ActivatorContent>
                 <MudAvatar Color="Color.Primary" Style="height:35px; width:35px; font-size:1.25rem;">
-                    @context.Username().Substring(0,1).ToUpper()
+                    @context.Username().Substring(0, 1).ToUpper()
                 </MudAvatar>
             </ActivatorContent>
             <ChildContent>
@@ -46,15 +44,9 @@
     </MudDrawer>
     <MudMainContent>
         <MudPaper Elevation="1" Class="top-bar">
-           @*  <MudToolBar>
-                <MudText Typo="Typo.h1"></MudText> |
-                <NetAppBreadCrumb CurrentPage="@RoutingState.Value.Uri" />
-                <MudSpacer />
-
-            </MudToolBar> *@
             <NetAppTopBar CurrentUrl="@RoutingState.Value.Uri" />
         </MudPaper>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="pt-8">
+        <MudContainer Class="pt-8">
             @ChildContent
         </MudContainer>
     </MudMainContent>

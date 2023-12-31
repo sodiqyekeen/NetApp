@@ -1,6 +1,7 @@
 ﻿@namespace NetApp.Pwa.Pages
 @attribute [Route(ApplicationConstants.Routes.Roles)]
-@inject IIdentityService IdentityService
+@inject IRoleService RoleService
+@inject IDialogService DialogService
 @implements IDisposable
 <MudGrid>
     @foreach (var role in roles)
@@ -25,8 +26,8 @@
                         </ul>
                     </div>
                     <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
-                        <MudButton Variant="Variant.Filled" Class="ml-2">View</MudButton>
-                        <MudButton Variant="Variant.Filled" Class="ml-2">Edit</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" Class="ml-2" OnClick="(() => OpenRoleDialogAsync(role.Id))" >Edit</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" Class="ml-2" Href="@($"/user-management/roles/{role.Id}/permissions")" >Manage Permissions</MudButton>
                     </MudStack>
                 </MudStack>
             </MudPaper>
@@ -34,22 +35,37 @@
     }    
     <MudItem md="3">
         <MudPaper Elevation="0" Height="100%" Class="pa-6 ">
+            <MudLink OnClick="(() => OpenRoleDialogAsync(null))">
             <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="6" Style="height:100% !important">
-                <MudIcon Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="width:150px; height:150px;"></MudIcon>
+                <MudIcon  Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="width:150px; height:150px;"></MudIcon>
                 <MudText Typo="Typo.h6">Add Role</MudText>
             </MudStack>
+            </MudLink>
         </MudPaper>
     </MudItem>
 
 </MudGrid>
 
 @code {
-    List<RoleWithPermissionsResponse> roles = new();
+    IEnumerable<RoleWithPermissionsResponse> roles = [];
     CancellationTokenSource cancellationTokenSource = new();
 
     protected override async Task OnInitializedAsync()
     {
-        roles = await IdentityService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
+        roles = await RoleService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
+    }
+
+    private async Task OpenRoleDialogAsync(string? roleId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(RoleDialog.RoleId), roleId);
+        var dialog = DialogService.Show<RoleDialog>("Save Role", parameters);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            roles = await RoleService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
+            StateHasChanged();
+        }
     }
 
     public void Dispose()

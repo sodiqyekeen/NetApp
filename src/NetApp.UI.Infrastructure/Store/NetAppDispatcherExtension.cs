@@ -1,6 +1,7 @@
 using Fluxor;
+using NetApp.UI.Infrastructure.Store;
 
-namespace NetApp.UI.Infrastructure.Store;
+namespace NetApp.UI.Infrastructure.Extensions;
 
 public static class NetAppDispatcherExtensions
 {

@@ -20,6 +20,12 @@ public static class Endpoints
     public static class Role
     {
         private const string BaseUrl = "roles/";
+        public const string GetAll = BaseUrl;
         public const string GetAllRolesWithPermissions = BaseUrl + "permissions";
+        public static string GetById(string id) => $"{BaseUrl}{id}";
+        public const string Save = BaseUrl;
+        public static string GetAllPermissions(string id) => $"{BaseUrl}{id}/permissions";
+        public static string UpdatePermissions(string id) => $"{BaseUrl}{id}/permissions";
+        public static string DeleteRole(string id) => $"{BaseUrl}{id}";
     }
 }

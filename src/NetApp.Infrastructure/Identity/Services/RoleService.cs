@@ -58,7 +58,7 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
     public async Task<IResponse<PermissionResponse>> GetAllPermissionsAsync(string roleId)
     {
         var allPermissions = PermissionHelper.GetAllPermissions().ToList();
-        var role = await dbContext.Roles.Include(r => r.RoleClaims).FirstOrDefaultAsync(r => r.Id == roleId) ?? throw new NotFoundException(localizer["Invalid role id."]);
+        var role = await dbContext.Roles.Include(r => r.RoleClaims.Where(c => c.ClaimType == SharedConstants.CustomClaimTypes.Permission)).FirstOrDefaultAsync(r => r.Id == roleId) ?? throw new NotFoundException(localizer["Invalid role id."]);
         var authorizedClaims = role.RoleClaims.ToDictionary(c => c.ClaimValue!, c => c);
 
         foreach (var permission in allPermissions.SelectMany(a => a.Permissions))

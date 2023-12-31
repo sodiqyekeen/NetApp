@@ -61,8 +61,5 @@ public class IdentityService(HttpClient httpClient, ISnackbar snackbar, IStringL
     {
         return await PutAsync(Endpoints.Identity.UserRoles(userId), request);
     }
-    public async Task<List<RoleWithPermissionsResponse>> GetAllRolesWithPermissionsAsync(CancellationToken cancellationToken)
-    {
-        return await GetAsync<List<RoleWithPermissionsResponse>>(Endpoints.Role.GetAllRolesWithPermissions, cancellationToken);
-    }
+
 }

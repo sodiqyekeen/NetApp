@@ -33,7 +33,7 @@ internal static class RoleEndpoints
 
         group.MapGet("/{id}/permissions", async (string id, IRoleService roleService) =>
         Results.Ok(await roleService.GetAllPermissionsAsync(id)))
-        .Produces<IResponse<IEnumerable<PermissionResponse>>>(StatusCodes.Status200OK)
+        .Produces<IResponse<PermissionResponse>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
         group.MapPut("/{id}/permissions", async (string id, PermissionRequest request, IRoleService roleService) =>

@@ -1,7 +1,79 @@
 ﻿@namespace NetApp.Pwa.Pages
-@attribute [Route(ApplicationConstants.Routes.Permissions)]
-<h3>Permissions</h3>
+@page "/user-management/roles/{RoleId}/permissions"
+@inject IRoleService RoleService
+@inject IDispatcher Dispatcher
 
+@if (permissionResponse is not null)
+{
+    <MudTabs Elevation="25" Rounded="true" Centered="true" ApplyEffectsToContainer="true" AlwaysShowScrollButtons="true">
+    @foreach (var module in permissionResponse.RolePermissions)
+        {
+            <MudTabPanel Text="@module.Name" Style="padding-right: 43px;"
+                BadgeData="@($"{module.Permissions.Count(p => p.Selected)} / {module.Permissions.Count}")">
+
+                <MudTable Hover=" true" Elevation="25" Items="@module.Permissions">
+                    <ToolBarContent>
+                        <MudHidden Breakpoint="Breakpoint.Xs">
+
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
+                                ButtonType="ButtonType.Submit">Update Permissions</MudButton>
+
+                            <MudSpacer />
+                        </MudHidden>
+
+                        <MudTextField @bind-Value="_searchString" Immediate="true" FullWidth=false Placeholder="Search"
+                            Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                            Class="mt-0 mb-3"></MudTextField>
+
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Description</MudTh>
+                        <MudTh>Status</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Permission Name">
+                            <MudHighlighter Text="@context.Name" HighlightedText="@_searchString" />
+                        </MudTd>
+                        <MudTd DataLabel="Description">
+                            <MudHighlighter Text="@context.Description" HighlightedText="@_searchString" />
+                        </MudTd>
+
+                        <MudTd DataLabel="Status">
+                            <MudCheckBox @bind-Checked="@context.Selected" Color="Color.Secondary" />
+                        </MudTd>
+                    </RowTemplate>
+
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            </MudTabPanel>
+        }
+    </MudTabs>
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+
+</MudHidden>
+}
 @code {
 
+    [Parameter]
+    public string RoleId { get; set; } = default!;
+
+    private PermissionResponse? permissionResponse;
+    private string _searchString = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Dispatcher.ToggleLoader(true);
+        permissionResponse = await RoleService.GetAllPermissionsAsync(RoleId);
+        Dispatcher.ToggleLoader(false);
+    }
+
+    private Color GetGroupBadgeColor(int selected, int all) =>
+    selected switch
+    {
+        0 => Color.Error,
+        _ => selected == all ? Color.Success : Color.Info
+    };
 }

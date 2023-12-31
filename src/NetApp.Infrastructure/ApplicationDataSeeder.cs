@@ -15,13 +15,15 @@ public class ApplicationDataSeeder : IDatabaseSeeder
 
     public ApplicationDataSeeder(RoleManager<NetAppRole> roleManager, UserManager<NetAppUser> userManager, NetAppDbContext db)
     {
-        _roleManager=roleManager;
-        _userManager=userManager;
-        _db=db;
+        _roleManager = roleManager;
+        _userManager = userManager;
+        _db = db;
     }
     private async Task DefaultRolesAsync()
     {
-        var superAdminRole = await _roleManager.FindByNameAsync(DomainConstants.Role.SuperAdmin);
+        var superAdminRole = await _db.Roles
+        .Include(r => r.RoleClaims.Where(c => c.ClaimType == SharedConstants.CustomClaimTypes.Permission))
+        .FirstOrDefaultAsync(r => r.Name == DomainConstants.Role.SuperAdmin); //_roleManager.FindByNameAsync(DomainConstants.Role.SuperAdmin);
         if (superAdminRole == null)
         {
             await _roleManager.CreateAsync(new NetAppRole(DomainConstants.Role.SuperAdmin, "Super user role") { CreatedBy = "System" });
@@ -29,8 +31,10 @@ public class ApplicationDataSeeder : IDatabaseSeeder
         }
 
         foreach (var permission in PermissionHelper.GetAllPermissions().SelectMany(x => x.Permissions).Select(p => p.Value))
+        {
+            if (superAdminRole!.RoleClaims.Any(x => x.ClaimValue == permission)) continue;
             await _roleManager.AddClaimAsync(superAdminRole!, new Claim(SharedConstants.CustomClaimTypes.Permission, permission));
-
+        }
     }
 
     private async Task DefaultUsersAsync()
@@ -44,7 +48,7 @@ public class ApplicationDataSeeder : IDatabaseSeeder
             PhoneNumberConfirmed = true,
             Active = true,
             FirstName = "Sodiq",
-            LastName= "Yekeen"
+            LastName = "Yekeen"
         };
 
         if (await _userManager.FindByEmailAsync(defaultUser.Email) != null)

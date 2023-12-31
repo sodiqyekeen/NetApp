@@ -13,4 +13,5 @@ public interface IIdentityService
     Task<IResponse> ResetPasswordAsync(string userId, ResetPasswordRequest request);
     Task<IResponse> UpdatePasswordAsync(string userId, UpdatePasswordRequest request);
     Task<UserDto?> GetUserAsync(string id);
+    Task<List<RoleWithPermissionsResponse>> GetAllRolesWithPermissionsAsync(CancellationToken cancellationToken);
 }

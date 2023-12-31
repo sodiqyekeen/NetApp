@@ -15,3 +15,5 @@ public record ModulePermission(string Name, string Description, List<Permission>
 public record PermissionBase(string Value){
      public bool Selected { get; set; }
 }
+
+public record RoleWithPermissionsResponse(string Id, string Name, string Description, List<string> Permissions);

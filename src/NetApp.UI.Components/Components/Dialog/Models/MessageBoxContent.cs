@@ -17,7 +17,7 @@ public class MessageBoxContent
     /// <summary>
     /// Gets or sets the name of the icon to display.
     /// </summary>
-    public Icon? Icon { get; set; }
+    // public Icon? Icon { get; set; }
 
     /// <summary>
     /// Gets or sets the color of the icon to display.

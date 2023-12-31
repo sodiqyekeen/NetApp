@@ -16,4 +16,10 @@ public static class Endpoints
         public static string UpdatePassword(string userId) => $"{Users}/{userId}/update-password";
         public static string UserRoles(string userId) => $"{Users}/{userId}/roles";
     }
+
+    public static class Role
+    {
+        private const string BaseUrl = "roles/";
+        public const string GetAllRolesWithPermissions = BaseUrl + "permissions";
+    }
 }

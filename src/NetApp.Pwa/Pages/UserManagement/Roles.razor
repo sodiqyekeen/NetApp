@@ -1,56 +1,37 @@
 ﻿@namespace NetApp.Pwa.Pages
 @attribute [Route(ApplicationConstants.Routes.Roles)]
+@inject IIdentityService IdentityService
+@implements IDisposable
 <MudGrid>
-    <MudItem md="3">
-        <MudPaper Elevation="0" Height="100%" Class="pa-4 pt-6">
-            <MudStack Style="height:100% !important" Justify="Justify.SpaceBetween">
-                <div>
-                    <MudText Typo="Typo.h6">Administrator</MudText>
-                    <MudText Class="mt-4" Typo="Typo.body2"> Total users with this role: 5 </MudText>
-                </div>
-                <div class="pt-4 pl-2">
-                    <ul>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create users</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create roles</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create permissions</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">and 7 more...</MudText></li>
-                    </ul>
-                </div>
-                <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
-                    <MudButton Variant="Variant.Filled" Class="ml-2">View</MudButton>
-                    <MudButton Variant="Variant.Filled" Class="ml-2">Edit</MudButton>
+    @foreach (var role in roles)
+    {
+        <MudItem md="3">
+            <MudPaper Elevation="0" Height="100%" Class="pa-4 pt-6">
+                <MudStack Style="height:100% !important" Justify="Justify.SpaceBetween">
+                    <div>
+                        <MudText Typo="Typo.h6">@role.Name</MudText>
+                        <MudText Class="mt-4" Typo="Typo.body2">@role.Description </MudText>
+                    </div>
+                    <div class="pt-2 pl-2">
+                        <ul>
+                            @foreach (var permission in role.Permissions.Take(5))
+                            {
+                                <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">@permission</MudText></li>
+                            }
+                            @if (role.Permissions.Count > 5)
+                            {
+                                <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">and @(role.Permissions.Count - 5) more...</MudText></li>
+                            }
+                        </ul>
+                    </div>
+                    <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
+                        <MudButton Variant="Variant.Filled" Class="ml-2">View</MudButton>
+                        <MudButton Variant="Variant.Filled" Class="ml-2">Edit</MudButton>
+                    </MudStack>
                 </MudStack>
-            </MudStack>
-        </MudPaper>
-    </MudItem>
-    <MudItem md="3">
-        <MudPaper Elevation="0" Height="100%" Class="pa-4 pt-6">
-            <MudStack Style="height:100% !important" Justify="Justify.SpaceBetween">
-                <div>
-                <MudText Typo="Typo.h6">Supervisor</MudText>
-                <MudText Typo="Typo.body2" Class="mt-4">
-                    Total users with this role: 5
-                </MudText>
-                </div>
-                <div class="pt-4 pl-2">
-                    <ul>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create users</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create roles</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create permissions</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">Can create departments</MudText></li>
-                        <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">and 7 more...</MudText></li>
-                    </ul>
-                </div>
-                <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
-                    <MudButton Variant="Variant.Filled" Class="ml-2">View</MudButton>
-                    <MudButton Variant="Variant.Filled" Class="ml-2">Edit</MudButton>
-                </MudStack>
-            </MudStack>
-        </MudPaper>
-    </MudItem>
+            </MudPaper>
+        </MudItem>
+    }    
     <MudItem md="3">
         <MudPaper Elevation="0" Height="100%" Class="pa-6 ">
             <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="6" Style="height:100% !important">
@@ -63,5 +44,17 @@
 </MudGrid>
 
 @code {
+    List<RoleWithPermissionsResponse> roles = new();
+    CancellationTokenSource cancellationTokenSource = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await IdentityService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
+    }
+
+    public void Dispose()
+    {
+        cancellationTokenSource.Cancel();
+        cancellationTokenSource.Dispose();
+    }
 }

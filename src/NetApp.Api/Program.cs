@@ -33,6 +33,8 @@ app.UseAuthorization();
 app.UseMiddleware<ApiErrorHandler>();
 var api = app.MapGroup("/api").WithOpenApi();
 api.MapIdentityEndpoints();
+api.MapRoleEndpoints();
+
 //app.MapIdentityApi<NetAppUser>();
 
 app.SeedDatabase();

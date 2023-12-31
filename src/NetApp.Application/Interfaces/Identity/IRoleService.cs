@@ -8,4 +8,5 @@ public interface IRoleService
     Task<IResponse<RoleResponse>> GetByIdAsync(string id);
     Task<IResponse<string>> SaveAsync(RoleRequest request);
     Task<IResponse> UpdatePermissionsAsync(PermissionRequest request);
+    Task<IResponse<List<RoleWithPermissionsResponse>>> GetAllRolesWithPermissionsAsync(CancellationToken cancellationToken);
 }

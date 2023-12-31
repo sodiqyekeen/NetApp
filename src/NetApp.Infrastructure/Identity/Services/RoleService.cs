@@ -28,6 +28,33 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
         return Response<List<RoleResponse>>.Success(roles);
     }
 
+    public async Task<IResponse<List<RoleWithPermissionsResponse>>> GetAllRolesWithPermissionsAsync(CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return Response<List<RoleWithPermissionsResponse>>.Fail(localizer["Request cancelled."]);
+
+        var allPermissions = PermissionHelper.GetAllPermissions().SelectMany(mp => mp.Permissions).ToDictionary(p => p.Value, p => p.Description);
+        var query = roleManager.Roles.Include(r => r.RoleClaims.Where(c => c.ClaimType == SharedConstants.CustomClaimTypes.Permission));
+#if !DEBUG
+        query = query.Where(x => x.Name != DomainConstants.Role.SuperAdmin);
+#endif
+        var response = new List<RoleWithPermissionsResponse>();
+        var roles = await query.ToListAsync(cancellationToken);
+        foreach (var role in roles)
+        {
+            var roleWithPermissions = new RoleWithPermissionsResponse(role.Id, role.Name!, role.Description, []);
+            foreach (var claim in role.RoleClaims)
+            {
+                if (!allPermissions.TryGetValue(claim.ClaimValue!, out var description)) continue;
+                roleWithPermissions.Permissions.Add(description);
+            }
+            response.Add(roleWithPermissions);
+        }
+        return Response<List<RoleWithPermissionsResponse>>.Success(response);
+    }
+
+
+
     public async Task<IResponse<PermissionResponse>> GetAllPermissionsAsync(string roleId)
     {
         var allPermissions = PermissionHelper.GetAllPermissions().ToList();

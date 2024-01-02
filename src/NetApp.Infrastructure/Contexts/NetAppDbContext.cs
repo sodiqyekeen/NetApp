@@ -57,16 +57,16 @@ public class NetAppDbContext : AuditableContext //, INetAppDbContext
         modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserToken", "Identity");
     }
 
-    public async Task SaveDbChangesAsync(CancellationToken cancellationToken)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
     {
-        string userId = string.IsNullOrWhiteSpace(_currentUserService.UserId) ? "System" : _currentUserService.UserId;
+        string currentUser = _currentUserService.UserId ?? "System";
 
         foreach (var entry in ChangeTracker.Entries<IEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.CreatedBy ??= userId;
+                    entry.Entity.CreatedBy ??= currentUser;
                     entry.Entity.CreatedOn = _dateTimeService.Now;
                     break;
                 case EntityState.Modified when entry.Entity is IAuditableEntity auditableEntity:
@@ -75,6 +75,27 @@ public class NetAppDbContext : AuditableContext //, INetAppDbContext
                     break;
             }
         }
-        await base.SaveChangesAsync(userId, cancellationToken);
+        return await base.SaveChangesAsync(currentUser, cancellationToken);
     }
+
+    // public async Task SaveDbChangesAsync(CancellationToken cancellationToken)
+    // {
+    //     string currentUser = _currentUserService.UserId ?? "System";
+
+    //     foreach (var entry in ChangeTracker.Entries<IEntity>())
+    //     {
+    //         switch (entry.State)
+    //         {
+    //             case EntityState.Added:
+    //                 entry.Entity.CreatedBy ??= currentUser;
+    //                 entry.Entity.CreatedOn = _dateTimeService.Now;
+    //                 break;
+    //             case EntityState.Modified when entry.Entity is IAuditableEntity auditableEntity:
+    //                 auditableEntity.LastModifiedBy = _currentUserService.UserId;
+    //                 auditableEntity.LastModifiedOn = _dateTimeService.Now;
+    //                 break;
+    //         }
+    //     }
+    //     await base.SaveChangesAsync(currentUser, cancellationToken);
+    // }
 }

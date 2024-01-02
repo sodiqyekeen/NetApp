@@ -2,21 +2,25 @@
 @page "/user-management/roles/{RoleId}/permissions"
 @inject IRoleService RoleService
 @inject IDispatcher Dispatcher
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 @if (permissionResponse is not null)
 {
     <MudTabs Elevation="25" Rounded="true" Centered="true" ApplyEffectsToContainer="true" AlwaysShowScrollButtons="true">
     @foreach (var module in permissionResponse.RolePermissions)
         {
+            var selectedCount = module.Permissions.Count(p => p.Selected);
             <MudTabPanel Text="@module.Name" Style="padding-right: 43px;"
-                BadgeData="@($"{module.Permissions.Count(p => p.Selected)} / {module.Permissions.Count}")">
+                BadgeData="@($"{selectedCount} / {module.Permissions.Count}")"
+                BadgeColor="@GetGroupBadgeColor(selectedCount, module.Permissions.Count)">
 
                 <MudTable Hover=" true" Elevation="25" Items="@module.Permissions">
                     <ToolBarContent>
                         <MudHidden Breakpoint="Breakpoint.Xs">
 
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
-                                ButtonType="ButtonType.Submit">Update Permissions</MudButton>
+                                ButtonType="ButtonType.Submit" OnClick="UpdatePermissionsAsync">Update Permissions</MudButton>
 
                             <MudSpacer />
                         </MudHidden>
@@ -57,10 +61,10 @@
 }
 @code {
 
-    [Parameter]
-    public string RoleId { get; set; } = default!;
+        [Parameter]
+        public string RoleId { get; set; } = default!;
 
-    private PermissionResponse? permissionResponse;
+private PermissionResponse? permissionResponse;
     private string _searchString = "";
 
     protected override async Task OnInitializedAsync()
@@ -76,4 +80,26 @@
         0 => Color.Error,
         _ => selected == all ? Color.Success : Color.Info
     };
+
+    private async Task UpdatePermissionsAsync()
+    {
+        Dispatcher.ToggleLoader(true);
+        var request = new PermissionRequest
+            {
+                RoleId = RoleId,
+                Permissions = permissionResponse!.RolePermissions.SelectMany(p => p.Permissions).Select(p => new PermissionBase(p.Value,
+                p.Selected)).ToList()
+            };
+        var response = await RoleService.UpdatePermissionsAsync(request);
+        Dispatcher.ToggleLoader(false);
+        if (response.Succeeded)
+        {
+            Snackbar.Add(response.Message, Severity.Success);
+            NavigationManager.NavigateTo(ApplicationConstants.Routes.Roles);
+        }
+        else
+        {
+            Snackbar.Add(response.Message, Severity.Error);
+        }
+    }
 }

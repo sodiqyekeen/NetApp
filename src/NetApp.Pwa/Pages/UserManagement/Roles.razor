@@ -2,18 +2,21 @@
 @attribute [Route(ApplicationConstants.Routes.Roles)]
 @inject IRoleService RoleService
 @inject IDialogService DialogService
+@inject IDispatcher Dispatcher
+@inject ISnackbar Snackbar
 @implements IDisposable
 <MudGrid>
-    @foreach (var role in roles)
+    @foreach (var role in roles.OrderBy(r => r.Name))
     {
         <MudItem md="3">
-            <MudPaper Elevation="0" Height="100%" Class="pa-4 pt-6">
-                <MudStack Style="height:100% !important" Justify="Justify.SpaceBetween">
+            <MudPaper Elevation="0" Height="100%" Class="relative pa-4 pt-6 pb-6">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="(()=> DeleteRoleAsync(role.Id))" Color="Color.Error" style="position: absolute; right:5px; top:10px;" />
+                <MudStack Style="height:100%" Justify="Justify.SpaceBetween">
                     <div>
                         <MudText Typo="Typo.h6">@role.Name</MudText>
-                        <MudText Class="mt-4" Typo="Typo.body2">@role.Description </MudText>
+                        <MudText  Typo="Typo.body2">@role.Description </MudText>
                     </div>
-                    <div class="pt-2 pl-2">
+                    <MudPaper Height="100%" Elevation="0" Class="pt-2">
                         <ul>
                             @foreach (var permission in role.Permissions.Take(5))
                             {
@@ -24,7 +27,7 @@
                                 <li><span class="bullet"></span> <MudText Class="d-inline-block" Typo="Typo.body2">and @(role.Permissions.Count - 5) more...</MudText></li>
                             }
                         </ul>
-                    </div>
+                    </MudPaper>
                     <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
                         <MudButton Variant="Variant.Filled" Size="Size.Small" Class="ml-2" OnClick="(() => OpenRoleDialogAsync(role.Id))" >Edit</MudButton>
                         <MudButton Variant="Variant.Filled" Size="Size.Small" Class="ml-2" Href="@($"/user-management/roles/{role.Id}/permissions")" >Manage Permissions</MudButton>
@@ -52,7 +55,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        roles = await RoleService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
+        Dispatcher.ToggleLoader(true);
+        await LoadRolesAsync();
+        Dispatcher.ToggleLoader(false);
     }
 
     private async Task OpenRoleDialogAsync(string? roleId)
@@ -63,9 +68,39 @@
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            roles = await RoleService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
+            await LoadRolesAsync();
+        }
+    }
+
+    private async Task DeleteRoleAsync(string roleId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(DeleteConfirmation.ContentText), "Are you sure you want to delete this role?");
+        var dialog = DialogService.Show<DeleteConfirmation>("Delete Role", parameters);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            Dispatcher.ToggleLoader(true);
+            var response = await RoleService.DeleteRoleAsync(roleId);
+            if(response.Succeeded)
+            {
+                await LoadRolesAsync();
+                Dispatcher.ToggleLoader(false);
+                Snackbar.Add(response.Message, Severity.Success);
+            }
+            else
+            {
+                Dispatcher.ToggleLoader(false);
+                Snackbar.Add(response.Message, Severity.Error);
+            }
+                        
             StateHasChanged();
         }
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        roles = await RoleService.GetAllRolesWithPermissionsAsync(cancellationTokenSource.Token);
     }
 
     public void Dispose()

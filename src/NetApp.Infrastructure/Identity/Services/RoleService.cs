@@ -13,7 +13,9 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
     public async Task<IResponse> DeleteAsync(string id)
     {
         var role = await dbContext.Roles.FindAsync(id) ?? throw new NotFoundException(localizer["Invalid role id."]);
-        dbContext.Roles.Remove(role);
+        if (role.Name == DomainConstants.Role.SuperAdmin)
+            throw new ApiException(localizer["This role cannot be deleted."]);
+        await roleManager.DeleteAsync(role);
         await dbContext.SaveChangesAsync();
         return Response.Success(localizer["Role deleted successfully."]);
     }
@@ -53,8 +55,6 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
         return Response<List<RoleWithPermissionsResponse>>.Success(response);
     }
 
-
-
     public async Task<IResponse<PermissionResponse>> GetAllPermissionsAsync(string roleId)
     {
         var allPermissions = PermissionHelper.GetAllPermissions().ToList();
@@ -89,6 +89,8 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
             return await CreateRoleAsync(request);
 
         var role = await roleManager.FindByIdAsync(request.Id) ?? throw new NotFoundException(localizer["Invalid role id."]);
+        if (role.Name == DomainConstants.Role.SuperAdmin)
+            throw new ApiException(localizer["This role cannot be updated."]);
         return await UpdateRoleAsync(request, role);
     }
 
@@ -112,7 +114,7 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
         var response = await roleManager.CreateAsync(role);
         if (response.Succeeded)
             return Response<string>.Success(role.Id, localizer["Role created successfully."]);
-        logger.LogError("Unable to create role. Errors: {0}", response.Errors);
+        logger.LogError("Unable to create role. Errors: {Errors}", response.Errors);
         throw new ApiException(localizer["Unable to create role."]);
     }
 
@@ -121,7 +123,7 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
         var role = await roleManager.FindByIdAsync(request.RoleId!) ?? throw new NotFoundException(localizer["Invalid role id."]);
         if (role.Name == DomainConstants.Role.SuperAdmin)
             throw new ApiException(localizer["Permissions for this role cannot be updated."]);
-        if (role.Name == DomainConstants.Role.Admin && currentUserService.Role != DomainConstants.Role.SuperAdmin)
+        if (role.Name == DomainConstants.Role.Admin && currentUserService.Roles.All(r => r != DomainConstants.Role.SuperAdmin))
             throw new ApiException(localizer["Permissions for this role cannot be updated."]);
 
         var newPermissions = request.Permissions.Where(p => p.Selected).Select(p => p.Value).ToList();
@@ -150,4 +152,6 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
         if (!newPermissions.ContainsAll(Permissions.User.View, Permissions.Role.View))
             throw new ApiException(localizer["Admin role must have all user's and role permissions."]);
     }
+
+
 }

@@ -1,0 +1,26 @@
+@inherits DialogBase
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Class="mr-3 mb-n1" />
+            Delete Confirmation
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">Confirm</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string ContentText { get; set; } = "Are you sure you want to delete this item?";
+
+    private void Submit()
+    {
+        Dialog?.Close(DialogResult.Ok(true));
+    }
+}

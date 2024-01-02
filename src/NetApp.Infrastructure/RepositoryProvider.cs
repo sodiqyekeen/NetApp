@@ -13,5 +13,5 @@ public class RepositoryProvider(NetAppDbContext dbContext) : IRepositoryProvider
     public IEmailTemplateRepository EmailTemplateRepository => _emailTemplateRepository ??= new EmailTemplateRepository(dbContext);
     public ISessionRepository SessionRepository => _sessionRepository ??= new SessionRepository(dbContext);
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken()) => await dbContext.SaveDbChangesAsync(cancellationToken);
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken()) => await dbContext.SaveChangesAsync(cancellationToken);
 }

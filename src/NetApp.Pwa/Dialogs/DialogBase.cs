@@ -25,7 +25,7 @@ public class DialogBase : ComponentBase
         Dispatcher.ToggleLoader(false);
         if (response.Succeeded)
         {
-            Snackbar.Add(response.Data, Severity.Success);
+            Snackbar.Add(response.Message, Severity.Success);
             Dialog?.Close();
         }
         else

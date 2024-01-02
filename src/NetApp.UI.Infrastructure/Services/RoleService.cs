@@ -9,7 +9,7 @@ public interface IRoleService
     Task<IResponse<string>> SaveAsync(RoleRequest request);
     Task<IResponse> DeleteRoleAsync(string id);
     Task<PermissionResponse> GetAllPermissionsAsync(string id);
-    Task<IResponse> UpdatePermissionsAsync(PermissionRequest request, string id);
+    Task<IResponse> UpdatePermissionsAsync(PermissionRequest request);
     Task<IEnumerable<RoleWithPermissionsResponse>> GetAllRolesWithPermissionsAsync(CancellationToken cancellationToken);
 }
 
@@ -31,8 +31,8 @@ BaseService(httpClient, snackbar, localizer), IRoleService
     public async Task<IResponse<string>> SaveAsync(RoleRequest request) =>
     await PostAsync<RoleRequest, string>(Endpoints.Role.Save, request);
 
-    public async Task<IResponse> UpdatePermissionsAsync(PermissionRequest request, string id) =>
-    await PutAsync(Endpoints.Role.UpdatePermissions(id), request);
+    public async Task<IResponse> UpdatePermissionsAsync(PermissionRequest request) =>
+    await PutAsync(Endpoints.Role.UpdatePermissions(request.RoleId!), request);
 
     public async Task<IResponse> DeleteRoleAsync(string id) =>
     await DeleteAsync(Endpoints.Role.DeleteRole(id));

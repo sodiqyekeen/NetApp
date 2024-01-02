@@ -11,7 +11,7 @@ public abstract class BaseService
     public BaseService(HttpClient httpClient, ISnackbar snackbar, IStringLocalizer<NetAppLocalizer> localizer)
     {
         _httpClient = httpClient;
-        _snackbar=snackbar;
+        _snackbar = snackbar;
         _localizer = localizer;
     }
 
@@ -96,7 +96,7 @@ public abstract class BaseService
         try
         {
             var response = await _httpClient.DeleteAsync(uri);
-            return response.IsSuccessStatusCode ? Response.Success() : (await response.Content.ReadFromJsonAsync<IResponse>())!;
+            return (await response.Content.ReadFromJsonAsync<Response>())!;
         }
         catch (TaskCanceledException)
         {

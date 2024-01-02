@@ -2,7 +2,7 @@
 @inject IRoleService RoleService
 @inject IStringLocalizer<NetAppLocalizer> localizer
 
-<EditForm Model="@request">
+<EditForm Model="@request" OnValidSubmit="SaveAsync">
     <MudDialog Class="pa-4">
         <TitleContent>
             @{
@@ -74,4 +74,7 @@
             }
         }
     }
+
+    private async Task SaveAsync() => await SubmitAsync(() => RoleService.SaveAsync(request));
+
 }

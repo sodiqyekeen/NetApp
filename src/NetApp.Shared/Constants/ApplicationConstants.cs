@@ -5,6 +5,9 @@ public static class SharedConstants
     {
         public const string HubUrl = "/hubs";
         public const string OnRolesUpdated = "RolesUpdated";
+        public const string OnRoleDeleted = "RoleDeleted";
+        public const string OnConnected = "Connected";
+        public const string NotifyRolesUpdated = "NotifyRolesUpdated";
     }
 
     public static class CustomClaimTypes

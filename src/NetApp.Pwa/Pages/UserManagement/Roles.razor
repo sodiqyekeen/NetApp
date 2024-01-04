@@ -89,6 +89,7 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
+            await HubConnection.InvokeHubMethodAsync(SharedConstants.SignalR.NotifyRolesUpdated);
             await LoadRolesAsync();
         }
     }

@@ -7,7 +7,7 @@ public static class HubExtensions
 {
     public static HubConnection TryInitialize(this HubConnection? hubConnection, IConfiguration configuration, IStorageService storage)
     {
-        if (hubConnection == null)
+        if (hubConnection is null)
         {
             var url = configuration["ApiUrl"] + SharedConstants.SignalR.HubUrl;
             hubConnection = new HubConnectionBuilder()

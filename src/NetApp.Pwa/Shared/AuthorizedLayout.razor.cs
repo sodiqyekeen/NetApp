@@ -2,6 +2,8 @@ using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.SignalR.Client;
+using MudBlazor;
+using NetApp.Constants;
 using NetApp.Extensions;
 using NetApp.UI.Infrastructure;
 using NetApp.UI.Infrastructure.Extensions;
@@ -25,11 +27,11 @@ public partial class AuthorizedLayout : IAsyncDisposable
     [Inject] private IState<NetAppState> AppState { get; set; } = null!;
     [Inject] private IDispatcher Dispatcher { get; set; } = null!;
     [Inject] private IState<Fluxor.Blazor.Web.Middlewares.Routing.RoutingState> RoutingState { get; set; } = null!;
-
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private NetAppAuthStateProvider AuthStateProvider { get; set; } = null!;
     [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
-
+    private CancellationTokenSource _cancellationTokenSource = new();
     private readonly HashSet<string> _anonymousPages =
     [
         "login",
@@ -42,6 +44,11 @@ public partial class AuthorizedLayout : IAsyncDisposable
     {
         NavigationManager.LocationChanged += HandleLocationChanged;
         HubConnection = HubConnection.TryInitialize(Configuration, StorageService);
+#pragma warning disable CS4014 
+        HubConnection.ConnectWithRetryAsync(_cancellationTokenSource.Token);
+#pragma warning restore CS4014 
+        HubConnection.On<string>(SharedConstants.SignalR.OnConnected, HandleConnected);
+        HubConnection.On<string>(SharedConstants.SignalR.OnRoleDeleted, HandleRoleDeleted);
     }
     private async void Logout()
     {
@@ -57,6 +64,19 @@ public partial class AuthorizedLayout : IAsyncDisposable
         NavigationManager.NavigateTo(ApplicationConstants.Routes.Login, true);
     }
 
+    private void HandleConnected(string connectionId)
+    {
+        Snackbar.Add($"Connected", Severity.Success);
+    }
+
+    private async Task HandleRoleDeleted(string roleName)
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (!authState.User.IsInRole(roleName)) return;
+        Snackbar.Add($"Your role {roleName} has been deleted. You will be logged out.", Severity.Warning);
+        await AuthStateProvider.NotifyLogoutAsync();
+        NavigationManager.NavigateTo(ApplicationConstants.Routes.Login, true);
+    }
 
     public async ValueTask DisposeAsync()
     {

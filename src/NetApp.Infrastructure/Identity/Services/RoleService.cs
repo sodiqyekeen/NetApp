@@ -20,11 +20,14 @@ IHubContext<NetAppHub> hubContext)
 {
     public async Task<IResponse> DeleteAsync(string id)
     {
-        var role = await dbContext.Roles.FindAsync(id) ?? throw new NotFoundException(localizer["Invalid role id."]);
+        var role = await dbContext.Roles.Include(r => r.UserRoless).FirstOrDefaultAsync(r => r.Id == id) ?? throw new NotFoundException(localizer["Invalid role id."]);
         if (role.Name == DomainConstants.Role.SuperAdmin)
             throw new ApiException(localizer["This role cannot be deleted."]);
+        if (role.UserRoless.Any(ur => ur.UserId == currentUserService.UserId))
+            throw new ApiException(localizer["You cannot delete a role that you belong."]);
         await roleManager.DeleteAsync(role);
         await dbContext.SaveChangesAsync();
+        await hubContext.Clients.All.SendAsync(SharedConstants.SignalR.OnRoleDeleted, role.Name);
         return Response.Success(localizer["Role deleted successfully."]);
     }
 
@@ -110,6 +113,7 @@ IHubContext<NetAppHub> hubContext)
         var response = await roleManager.UpdateAsync(role);
         if (response.Succeeded)
             return Response<string>.Success(role.Id, localizer["Role updated successfully."]);
+
         logger.LogError("Unable to update role. Errors: {0}", response.Errors);
         throw new ApiException(localizer["Unable to update role."]);
     }
@@ -121,10 +125,7 @@ IHubContext<NetAppHub> hubContext)
         var role = new NetAppRole(request.Name!, request.Description!);
         var response = await roleManager.CreateAsync(role);
         if (response.Succeeded)
-        {
-            await hubContext.Clients.All.SendAsync(SharedConstants.SignalR.OnRolesUpdated);
             return Response<string>.Success(role.Id, localizer["Role created successfully."]);
-        }
         logger.LogError("Unable to create role. Errors: {Errors}", response.Errors);
         throw new ApiException(localizer["Unable to create role."]);
     }

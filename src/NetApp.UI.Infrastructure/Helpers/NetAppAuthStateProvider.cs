@@ -7,43 +7,31 @@ using NetApp.UI.Infrastructure.Extensions;
 using NetApp.UI.Infrastructure.Store;
 
 namespace NetApp.UI.Infrastructure;
-public class NetAppAuthStateProvider : AuthenticationStateProvider
+public class NetAppAuthStateProvider(IStorageService storageService, HttpClient httpClient) : AuthenticationStateProvider
 {
-    private readonly HttpClient _httpClient;
-    private readonly IStorageService _storageService;
-    private readonly ISnackbar _snackbar;
-    private readonly NavigationManager _navigationManager;
-    public NetAppAuthStateProvider(IStorageService storageService, ISnackbar snackbar, HttpClient httpClient, NavigationManager navigationManager)
-    {
-        _storageService = storageService;
-        _snackbar = snackbar;
-        _httpClient = httpClient;
-        _navigationManager = navigationManager;
-    }
-
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await _storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
+        var token = await storageService.GetItemAsync<string>(ApplicationConstants.Storage.AuthToken);
         if (string.IsNullOrWhiteSpace(token))
             return AuthenticationStateExtensions.Anonymous;
         var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(StringExtensions.GetClaims(token), "jwt"));
         var authenticationState = new AuthenticationState(claimsPrincipal);
         if (authenticationState.IsTokenExpired())
             return AuthenticationStateExtensions.Anonymous;
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         return authenticationState;
     }
 
     public async Task NotifyAuthenticatedAsync(AuthenticationResponse response)
     {
-        await _storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
-        await _storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
+        await storageService.SetItemAsync(ApplicationConstants.Storage.AuthToken, response.JWToken);
+        await storageService.SetItemAsync(ApplicationConstants.Storage.RefreshToken, response.RefreshToken);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public async Task NotifyLogoutAsync()
     {
-        await _storageService.ClearAsync();
+        await storageService.ClearAsync();
         NotifyAuthenticationStateChanged(Task.FromResult(AuthenticationStateExtensions.Anonymous));
     }
 

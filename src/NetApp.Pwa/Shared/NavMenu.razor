@@ -1,12 +1,23 @@
-﻿<MudNavMenu Rounded="true" Margin="Margin.Dense" Class="mud-width-full my-2">
-    <MudNavLink Href="@ApplicationConstants.Routes.Dashboard" Icon="@Icons.Material.Outlined.Dashboard"
-        Match="NavLinkMatch.All">Dashboard</MudNavLink>
-    <MudNavLink Href="counter" Icon="@Icons.Material.Outlined.Add">Counter</MudNavLink>
-    <MudNavLink Href="fetchdata" Icon="@Icons.Material.Outlined.List">Fetch Data</MudNavLink>
+﻿<AuthorizeView>
+    <MudNavMenu Rounded="true" Margin="Margin.Dense" Class="mud-width-full my-2">
+        <MudNavLink Href="@ApplicationConstants.Routes.Dashboard" Icon="@Icons.Material.Outlined.Dashboard"
+            Match="NavLinkMatch.All">Dashboard</MudNavLink>
+        <MudNavLink Href="counter" Icon="@Icons.Material.Outlined.Add">Counter</MudNavLink>
+        <MudNavLink Href="fetchdata" Icon="@Icons.Material.Outlined.List">Fetch Data</MudNavLink>
 
-    <MudNavGroup Title="User Management" Icon="@Icons.Material.Filled.AdminPanelSettings">
-        <MudNavLink Href="@ApplicationConstants.Routes.Users" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
-        <MudNavLink Href="@ApplicationConstants.Routes.Roles" Icon="@Icons.Material.Filled.PeopleAlt">Roles</MudNavLink>
-    </MudNavGroup>
-    <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
-</MudNavMenu>
+        <MudNavGroup Title="User Management" Icon="@Icons.Material.Filled.AdminPanelSettings">
+            @if (context.CanViewUsers())
+            {
+                <MudNavLink Href="@ApplicationConstants.Routes.Users" Icon="@Icons.Material.Filled.People">Users
+                </MudNavLink>
+            }
+            @if (context.CanViewRoles())
+            {
+                <MudNavLink Href="@ApplicationConstants.Routes.Roles" Icon="@Icons.Material.Filled.ManageAccounts">Roles
+                </MudNavLink>
+            }
+
+        </MudNavGroup>
+        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
+    </MudNavMenu>
+</AuthorizeView>

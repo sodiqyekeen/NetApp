@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 namespace NetApp.UI.Infrastructure.Extensions;
 public static class HubExtensions
 {
-    public static HubConnection TryInitialize(this HubConnection hubConnection, IConfiguration configuration, IStorageService storage)
+    public static HubConnection TryInitialize(this HubConnection? hubConnection, IConfiguration configuration, IStorageService storage)
     {
         if (hubConnection == null)
         {

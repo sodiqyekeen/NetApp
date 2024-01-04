@@ -1,4 +1,5 @@
 <AuthorizeView>
+    <CascadingValue Value="HubConnection" >
     <MudAppBar Elevation="0" Class="pr-8">
         <MudIconButton Class="d-flex d-md-none" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"
             Edge="Edge.Start" OnClick="ToggleDrawer" />
@@ -50,4 +51,5 @@
             @ChildContent
         </MudContainer>
     </MudMainContent>
+    </CascadingValue>
 </AuthorizeView>

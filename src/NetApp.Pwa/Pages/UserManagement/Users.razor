@@ -3,140 +3,183 @@
 @inject IIdentityService IdentityService
 @implements IDisposable
 @inject IDispatcher Dispatcher
+<AuthorizeView>
+    @{
+        var canViewUserDetail = context.CanViewUserDetails();
+        var canEditUser = context.CanEditUser();
+        var canDeleteUser = context.CanDeleteUser();
+        var canResendConfirmation = context.CanResendConfirmation();
+    }
 
-<MudTable ServerData="@(new Func<TableState, Task<TableData<UserDto>>>(LoadUsers))" Hover="true" Dense="true"
-    @ref="usersTable" MultiSelection="true">
-    <ToolBarContent>
-        <MudTextField T="string" ValueChanged="@(s => Search(s))" Placeholder="Search user" Adornment="Adornment.Start"
-            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable="true"></MudTextField>
-        <MudSpacer />
-        <MudSpacer />
-        <MudButton StartIcon="@Icons.Material.Filled.FilterAlt" Variant="Variant.Text" Color="Color.Primary"
-            Class="d-none d-sm-inline-flex">Filter</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.FileDownload" Variant="Variant.Text"
-            Class="ml-2 d-none d-sm-inline-flex" Color="Color.Primary">Export</MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Text" Color="Color.Primary" Class="ml-2">Add
-            User</MudButton>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>User</MudTh>
-        <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            <MudTh>Last Login</MudTh>
-            <MudTh>Two-Step</MudTh>
-        </MudHidden>
-        <MudTh>Status</MudTh>
-        <MudTh>Actions</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudHidden Breakpoint="Breakpoint.Xs">
-            <MudTd DataLabel="User">
-                <MudPaper Class="bg-transparent" Elevation="0">
-                    <MudStack Row="true">
-                        <MudAvatar Color="@(GetRandomAvatorColour())" Variant="Variant.Outlined">
-                            @context.Intials.ToUpper()
-                        </MudAvatar>
-                        <MudStack Justify="Justify.Center" Spacing="0">
-                            <MudText Typo="Typo.body1">@context.FullName</MudText>
-                            <MudText Typo="Typo.body2">@context.Email</MudText>
-                        </MudStack>
-                    </MudStack>
-                </MudPaper>
-            </MudTd>
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<UserDto>>>(LoadUsers))" Hover="true" Dense="true"
+        @ref="usersTable" MultiSelection="true">
+        <ToolBarContent>
+            <MudTextField T="string" ValueChanged="@(s => Search(s))" Placeholder="Search user"
+                Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                Clearable="true"></MudTextField>
+            <MudSpacer />
+            <MudSpacer />
+            <MudButton StartIcon="@Icons.Material.Filled.FilterAlt" Variant="Variant.Text" Color="Color.Primary"
+                Class="d-none d-sm-inline-flex">Filter</MudButton>
+            @if (context.CanExportUsers())
+            {
+                <MudButton StartIcon="@Icons.Material.Filled.FileDownload" Variant="Variant.Text"
+                    Class="ml-2 d-none d-sm-inline-flex" Color="Color.Primary">Export</MudButton>
+            }
+            @if (context.CanCreateUser())
+            {
+                <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Text" Color="Color.Primary" Class="ml-2">
+                    Add User
+                </MudButton>
+            }
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>User</MudTh>
             <MudHidden Breakpoint="Breakpoint.SmAndDown">
-                <MudTd DataLabel="Last Login">
-                    @if (context.LastLoginOn is not null)
-                    {
-                        @context.LastLoginOn.Value.GetTimeDifference()
-                        ;
-                    }
+                <MudTh>Last Login</MudTh>
+                <MudTh>Two-Step</MudTh>
+            </MudHidden>
+            <MudTh>Status</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="user">
+            <MudHidden Breakpoint="Breakpoint.Xs">
+                <MudTd DataLabel="User">
+                    <MudPaper Class="bg-transparent" Elevation="0">
+                        <MudStack Row="true">
+                            <MudAvatar Color="@(GetRandomAvatorColour())" Variant="Variant.Outlined">
+                                @user.Intials.ToUpper()
+                            </MudAvatar>
+                            <MudStack Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.body1">@user.FullName</MudText>
+                                <MudText Typo="Typo.body2">@user.Email</MudText>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
                 </MudTd>
-                <MudTd DataLabel="Two-Step">
-                    @if (context.TwoFactorEnabled)
+                <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                    <MudTd DataLabel="Last Login">
+                        @if (user.LastLoginOn is not null)
+                        {
+                            @user.LastLoginOn.Value.GetTimeDifference()
+                            ;
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Two-Step">
+                        @if (user.TwoFactorEnabled)
+                        {
+                            <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Text" Class="m-0">Enabled
+                            </MudChip>
+                        }
+                        else
+                        {
+                            <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Text" Class="m-0">Disabled
+                            </MudChip>
+                        }
+                    </MudTd>
+                </MudHidden>
+                <MudTd DataLabel="Status">
+                    @if (user.Active)
                     {
-                        <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Text" Class="m-0">Enabled
-                        </MudChip>
+                        <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Text" Class="m-0">Active</MudChip>
                     }
                     else
                     {
-                        <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Text" Class="m-0">Disabled</MudChip>
+                        <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Text" Class="m-0">Inactive</MudChip>
                     }
                 </MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="@Origin.TopCenter"
+                        ActivationEvent="MouseEvent.LeftClick">
+                        <ActivatorContent>
+                            <MudButton DisableElevation="true" Class="py-2" Variant="Variant.Filled" Size="Size.Small"
+                                EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary">Actions
+                            </MudButton>
+                        </ActivatorContent>
+                        <ChildContent>
+                            @if (canViewUserDetail)
+                            {
+                                <MudListItem Href="@(ApplicationConstants.Routes.UserDetail+user.Id)" Text="View" />
+                            }
+                            @if (canEditUser)
+                            {
+                                <MudListItem Text="Edit" />
+
+                                @if (user.TwoFactorEnabled)
+                                {
+                                    <MudListItem Text="Disable 2FA" />
+                                }
+                                else
+                                {
+                                    <MudListItem Text="Enable 2FA" />
+                                }
+                            }
+                            @if (canResendConfirmation && !user.EmailConfirmed)
+                            {
+                                <MudListItem Text="Resend Confirmation" />
+                            }
+                            @if (canDeleteUser)
+                            {
+                                <MudListItem Text="Delete" />
+                            }
+                        </ChildContent>
+                    </MudMenu>
+                </MudTd>
             </MudHidden>
-            <MudTd DataLabel="Status">
-                @if (context.Active)
-                {
-                    <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Text" Class="m-0">Active</MudChip>
-                }
-                else
-                {
-                    <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Text" Class="m-0">Inactive</MudChip>
-                }
-            </MudTd>
-            <MudTd DataLabel="Actions">
-                <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="@Origin.TopCenter"
-                    ActivationEvent="MouseEvent.LeftClick">
-                    <ActivatorContent>
-                        <MudButton DisableElevation="true" Class="py-2" Variant="Variant.Filled" Size="Size.Small"
-                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary">Actions
-                        </MudButton>
-                    </ActivatorContent>
-                    <ChildContent>
-                        <MudListItem Href="@(ApplicationConstants.Routes.UserDetail+context.Id)" Text="View" />
-                        <MudListItem Text="Edit" />
-                        <MudListItem Text="Delete" />
-                        @if (context.TwoFactorEnabled)
-                        {
-                            <MudListItem Text="Disable 2FA" />
-                        }
-                        else
-                        {
-                            <MudListItem Text="Enable 2FA" />
-                        }
-                        <MudListItem Text="Resend Confirmation" />
-                    </ChildContent>
-                </MudMenu>
-            </MudTd>
-        </MudHidden>
-        <MudPaper Elevation="2" Height="110px" Class="d-block d-sm-none pa-4">
-            <MudStack Row="true" Spacing="4" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween"
-                Style="height:100%;">
-                <MudStack Justify="Justify.Center" Spacing="0">
-                    <MudText Typo="Typo.body1">@context.FullName</MudText>
-                    <MudText Typo="Typo.body2">@context.Email</MudText>
+            <MudPaper Elevation="2" Height="110px" Class="d-block d-sm-none pa-4">
+                <MudStack Row="true" Spacing="4" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween"
+                    Style="height:100%;">
+                    <MudStack Justify="Justify.Center" Spacing="0">
+                        <MudText Typo="Typo.body1">@user.FullName</MudText>
+                        <MudText Typo="Typo.body2">@user.Email</MudText>
+                    </MudStack>
+
+                    <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="@Origin.TopCenter"
+                        ActivationEvent="MouseEvent.LeftClick">
+                        <ActivatorContent>
+                            <MudButton DisableElevation="true" Class="py-2" Variant="Variant.Filled" Size="Size.Small"
+                                EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary">Actions
+                            </MudButton>
+                        </ActivatorContent>
+                        <ChildContent>
+                            @if (canViewUserDetail)
+                            {
+                                <MudListItem Href="@(ApplicationConstants.Routes.UserDetail+user.Id)" Text="View" />
+                            }
+                            @if (canEditUser)
+                            {
+                                <MudListItem Text="Edit" />
+
+                                @if (user.TwoFactorEnabled)
+                                {
+                                    <MudListItem Text="Disable 2FA" />
+                                }
+                                else
+                                {
+                                    <MudListItem Text="Enable 2FA" />
+                                }
+                            }
+                            @if (canResendConfirmation && !user.EmailConfirmed)
+                            {
+                                <MudListItem Text="Resend Confirmation" />
+                            }
+                            @if (canDeleteUser)
+                            {
+                                <MudListItem Text="Delete" />
+                            }
+                        </ChildContent>
+                    </MudMenu>
                 </MudStack>
-
-                <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="@Origin.TopCenter"
-                    ActivationEvent="MouseEvent.LeftClick">
-                    <ActivatorContent>
-                        <MudButton DisableElevation="true" Class="py-2" Variant="Variant.Filled" Size="Size.Small"
-                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary">Actions
-                        </MudButton>
-                    </ActivatorContent>
-                    <ChildContent>
-                        <MudListItem Text="Edit" />
-                        <MudListItem Text="Delete" />
-                        @if (context.TwoFactorEnabled)
-                        {
-                            <MudListItem Text="Disable 2FA" />
-                        }
-                        else
-                        {
-                            <MudListItem Text="Enable 2FA" />
-                        }
-                        <MudListItem Text="Resend Confirmation" />
-                    </ChildContent>
-                </MudMenu>
-            </MudStack>
-        </MudPaper>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText>No matching records found</MudText>
-    </NoRecordsContent>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
-
+            </MudPaper>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</AuthorizeView>
 @code {
     MudTable<UserDto> usersTable = default!;
     string? searchString;

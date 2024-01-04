@@ -8,14 +8,14 @@
 @if (permissionResponse is not null)
 {
     <MudTabs Elevation="25" Rounded="true" Centered="true" ApplyEffectsToContainer="true" AlwaysShowScrollButtons="true">
-    @foreach (var module in permissionResponse.RolePermissions)
+    @foreach (var module in permissionResponse.RolePermissions.OrderBy(p => p.Name))
         {
             var selectedCount = module.Permissions.Count(p => p.Selected);
             <MudTabPanel Text="@module.Name" Style="padding-right: 43px;"
                 BadgeData="@($"{selectedCount} / {module.Permissions.Count}")"
                 BadgeColor="@GetGroupBadgeColor(selectedCount, module.Permissions.Count)">
 
-                <MudTable Hover=" true" Elevation="25" Items="@module.Permissions">
+                <MudTable Hover=" true" Elevation="25" Items="@module.Permissions.OrderBy(p => p.Name)">
                     <ToolBarContent>
                         <MudHidden Breakpoint="Breakpoint.Xs">
 
@@ -61,10 +61,10 @@
 }
 @code {
 
-        [Parameter]
-        public string RoleId { get; set; } = default!;
+    [Parameter]
+    public string RoleId { get; set; } = default!;
 
-private PermissionResponse? permissionResponse;
+    private PermissionResponse? permissionResponse;
     private string _searchString = "";
 
     protected override async Task OnInitializedAsync()

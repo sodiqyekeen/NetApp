@@ -7,7 +7,7 @@ public static class AuthenticationStateExtensions
     public static AuthenticationState Anonymous { get; set; } = new(new ClaimsPrincipal(new ClaimsPrincipal()));
 
     public static string Username(this AuthenticationState authenticationState) =>
-        authenticationState.User.FindFirst(ClaimTypes.Name)?.Value??"";
+        authenticationState.User.FindFirst(ClaimTypes.Name)?.Value ?? "";
 
     public static string UserEmail(this AuthenticationState authenticationState) =>
         authenticationState.User.FindFirst(ClaimTypes.Email)?.Value ?? "";
@@ -37,14 +37,9 @@ public static class AuthenticationStateExtensions
         return expireTime - DateTime.UtcNow;
     }
 
-    public static bool Authorize(this ClaimsPrincipal currentUser, string permission)
-    {
-        var permissions = currentUser.FindAll(c => c.Type == SharedConstants.CustomClaimTypes.Permission);
-        return permissions != null && permissions.Any(r => r.Value.Contains(permission));
-    }
+    public static bool Authorize(this ClaimsPrincipal currentUser, string permission) =>
+     currentUser.FindFirst(c => c.Type == SharedConstants.CustomClaimTypes.Permission && c.Value.Contains(permission)) != null;
 
-    public static bool Authorize(this AuthenticationState authState, string permission)
-    {
-        return authState.User.FindFirst(c => c.Type == SharedConstants.CustomClaimTypes.Permission && c.Value.Contains(permission)) != null;
-    }
+    public static bool Authorize(this AuthenticationState authState, string permission) =>
+    authState.User.FindFirst(c => c.Type == SharedConstants.CustomClaimTypes.Permission && c.Value.Contains(permission)) != null;
 }

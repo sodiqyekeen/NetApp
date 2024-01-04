@@ -12,7 +12,7 @@ public class UserDto
     public bool Active { get; set; }
     public DateTime? LastLoginOn { get; set; }
     public bool TwoFactorEnabled { get; set; }
-
+    public bool EmailConfirmed { get; set; }
     public string Intials => FirstName[..1] + LastName[..1];
     public string FullName => $"{FirstName} {LastName}";
 }

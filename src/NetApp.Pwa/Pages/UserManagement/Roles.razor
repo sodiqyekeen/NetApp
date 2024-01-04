@@ -5,12 +5,22 @@
 @inject IDispatcher Dispatcher
 @inject ISnackbar Snackbar
 @implements IDisposable
+<AuthorizeView>
+ @{
+    var canCreateRole = context.CanCreateRole();
+    var canManagePermissions = context.CanManagePermissions();
+    var canDeleteRole = context.CanDeleteRole();
+    var canEditRole = context.CanEditRole();
+ }
 <MudGrid>
     @foreach (var role in roles.OrderBy(r => r.Name))
     {
         <MudItem md="3">
             <MudPaper Elevation="0" Height="100%" Class="relative pa-4 pt-6 pb-6">
+                @if(canDeleteRole)
+                {
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="(()=> DeleteRoleAsync(role.Id))" Color="Color.Error" style="position: absolute; right:5px; top:10px;" />
+                }
                 <MudStack Style="height:100%" Justify="Justify.SpaceBetween">
                     <div>
                         <MudText Typo="Typo.h6">@role.Name</MudText>
@@ -29,35 +39,46 @@
                         </ul>
                     </MudPaper>
                     <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2">
+                        @if(canEditRole)
+                        {
                         <MudButton Variant="Variant.Filled" Size="Size.Small" Class="ml-2" OnClick="(() => OpenRoleDialogAsync(role.Id))" >Edit</MudButton>
+                        }
+                        @if(canManagePermissions)
+                        {
                         <MudButton Variant="Variant.Filled" Size="Size.Small" Class="ml-2" Href="@($"/user-management/roles/{role.Id}/permissions")" >Manage Permissions</MudButton>
+                        }
                     </MudStack>
                 </MudStack>
             </MudPaper>
         </MudItem>
     }    
-    <MudItem md="3">
-        <MudPaper Elevation="0" Height="100%" Class="pa-6 ">
-            <MudLink OnClick="(() => OpenRoleDialogAsync(null))">
-            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="6" Style="height:100% !important">
-                <MudIcon  Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="width:150px; height:150px;"></MudIcon>
-                <MudText Typo="Typo.h6">Add Role</MudText>
-            </MudStack>
-            </MudLink>
-        </MudPaper>
-    </MudItem>
-
+    @if(canCreateRole){
+        <MudItem md="3">
+            <MudPaper Elevation="0" Height="100%" Class="pa-6 ">
+                <MudLink OnClick="(() => OpenRoleDialogAsync(null))">
+                <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="6" Style="height:100% !important">
+                    <MudIcon  Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="width:150px; height:150px;"></MudIcon>
+                    <MudText Typo="Typo.h6">Add Role</MudText>
+                </MudStack>
+                </MudLink>
+            </MudPaper>
+        </MudItem>
+    }
 </MudGrid>
-
+</AuthorizeView>
 @code {
     IEnumerable<RoleWithPermissionsResponse> roles = [];
     CancellationTokenSource cancellationTokenSource = new();
-
+    [CascadingParameter] private HubConnection HubConnection { get; set; } = default!;
     protected override async Task OnInitializedAsync()
     {
         Dispatcher.ToggleLoader(true);
         await LoadRolesAsync();
         Dispatcher.ToggleLoader(false);
+        HubConnection.On(SharedConstants.SignalR.OnRolesUpdated, async () =>
+        {
+            await LoadRolesAsync();
+        });
     }
 
     private async Task OpenRoleDialogAsync(string? roleId)
@@ -66,7 +87,7 @@
         parameters.Add(nameof(RoleDialog.RoleId), roleId);
         var dialog = DialogService.Show<RoleDialog>("Save Role", parameters);
         var result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await LoadRolesAsync();
         }
@@ -78,7 +99,7 @@
         parameters.Add(nameof(DeleteConfirmation.ContentText), "Are you sure you want to delete this role?");
         var dialog = DialogService.Show<DeleteConfirmation>("Delete Role", parameters);
         var result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             Dispatcher.ToggleLoader(true);
             var response = await RoleService.DeleteRoleAsync(roleId);

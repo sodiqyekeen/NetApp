@@ -1,14 +1,22 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using NetApp.Domain.Exceptions;
 using NetApp.Infrastructure.Contexts;
+using NetApp.Infrastructure.Hubs;
 using NetApp.Shared;
 using System.Security.Claims;
 
 namespace NetApp.Infrastructure.Identity.Services;
 
-internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> roleManager, ISessionService currentUserService, IStringLocalizer<NetAppLocalizer> localizer, ILogger<RoleService> logger) : IRoleService
+internal class RoleService(NetAppDbContext dbContext,
+RoleManager<NetAppRole> roleManager,
+ISessionService currentUserService,
+IStringLocalizer<NetAppLocalizer> localizer,
+ILogger<RoleService> logger,
+IHubContext<NetAppHub> hubContext)
+ : IRoleService
 {
     public async Task<IResponse> DeleteAsync(string id)
     {
@@ -113,7 +121,10 @@ internal class RoleService(NetAppDbContext dbContext, RoleManager<NetAppRole> ro
         var role = new NetAppRole(request.Name!, request.Description!);
         var response = await roleManager.CreateAsync(role);
         if (response.Succeeded)
+        {
+            await hubContext.Clients.All.SendAsync(SharedConstants.SignalR.OnRolesUpdated);
             return Response<string>.Success(role.Id, localizer["Role created successfully."]);
+        }
         logger.LogError("Unable to create role. Errors: {Errors}", response.Errors);
         throw new ApiException(localizer["Unable to create role."]);
     }

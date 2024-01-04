@@ -21,7 +21,19 @@ public static class Permissions
         public const string Delete = "Permissions.User.Delete";
 
         [Description("Can manage user permission.")]
-        public const string ManagePermission = "Permissions.User.ManagePermission";
+        public const string ManageUserPermission = "Permissions.User.ManagePermission";
+
+        [Description("Can manage user roles.")]
+        public const string ManageRole = "Permissions.User.ManageRole";
+
+        [Description("Can resend user confirmation.")]
+        public const string ResendConfirmation = "Permissions.User.ResendConfirmation";
+
+        [Description("Can view user details.")]
+        public const string ViewDetails = "Permissions.User.ViewDetails";
+
+        [Description("Can export users.")]
+        public const string Export = "Permissions.User.Export";
     }
 
     [DisplayName("Role"), Description("Role Permissions")]
@@ -36,24 +48,20 @@ public static class Permissions
         [Description("Can edit roles.")]
         public const string Edit = "Permissions.Role.Edit";
 
-
         [Description("Can delete roles.")]
         public const string Delete = "Permissions.Role.Delete";
+
+        [Description("Can manage role permission.")]
+        public const string ManageRolePermission = "Permissions.Role.ManagePermission";
     }
 
-    [DisplayName("RoleClaim"), Description("RoleClaim Permissions")]
-    public static class RoleClaim
+    [DisplayName("Permission"), Description("System Permissions")]
+    public static class Permission
     {
-        [Description("Can view role claims.")]
+        [Description("Can view permissions.")]
         public const string View = "Permissions.RoleClaim.View";
 
-        [Description("Can create role claims.")]
-        public const string Create = "Permissions.RoleClaim.Create";
-
-        [Description("Can edit role claims.")]
-        public const string Edit = "Permissions.RoleClaim.Edit";
-
-        [Description("Can delete role claims.")]
-        public const string Delete = "Permissions.RoleClaim.Delete";
+        [Description("Can manage permissions.")]
+        public const string Manage = "Permissions.RoleClaim.Manage";
     }
 }

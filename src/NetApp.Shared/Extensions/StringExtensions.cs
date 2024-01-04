@@ -5,7 +5,7 @@ using System.Text;
 namespace NetApp.Extensions;
 public static class StringExtensions
 {
-    
+
     public static byte[] ParseBase64StringWithoutPadding(this string base64)
     {
         switch (base64.Length % 4)
@@ -38,6 +38,7 @@ public static class StringExtensions
         byte[] jsonBytes = payload.ParseBase64StringWithoutPadding();
         var keyValuePairs = jsonBytes.FromBytes<Dictionary<string, object>>();
         var claims = keyValuePairs!.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()!)).ToList();
+        Console.WriteLine("claims:  " + claims.ToJson());
         return claims;
     }
 

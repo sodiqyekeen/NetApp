@@ -5,7 +5,9 @@ using NetApp.Api;
 using NetApp.Api.Endpoints;
 using NetApp.Api.Services;
 using NetApp.Application;
+using NetApp.Constants;
 using NetApp.Infrastructure;
+using NetApp.Infrastructure.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ISessionService, SessionService>();
@@ -36,6 +38,6 @@ api.MapIdentityEndpoints();
 api.MapRoleEndpoints();
 
 //app.MapIdentityApi<NetAppUser>();
-
+app.MapHub<NetAppHub>(SharedConstants.SignalR.HubUrl);
 app.SeedDatabase();
 app.Run();

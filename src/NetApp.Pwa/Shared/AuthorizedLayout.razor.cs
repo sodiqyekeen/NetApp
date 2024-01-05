@@ -49,6 +49,7 @@ public partial class AuthorizedLayout : IAsyncDisposable
 #pragma warning restore CS4014 
         HubConnection.On<string>(SharedConstants.SignalR.OnConnected, HandleConnected);
         HubConnection.On<string>(SharedConstants.SignalR.OnRoleDeleted, HandleRoleDeleted);
+        HubConnection.On<string>(SharedConstants.SignalR.OnPermissionUpdated, HandlePermissionUpdated);
     }
     private async void Logout()
     {
@@ -66,7 +67,7 @@ public partial class AuthorizedLayout : IAsyncDisposable
 
     private void HandleConnected(string connectionId)
     {
-        Snackbar.Add($"Connected", Severity.Success);
+        Snackbar.Add($"Connected", Severity.Info);
     }
 
     private async Task HandleRoleDeleted(string roleName)
@@ -78,6 +79,14 @@ public partial class AuthorizedLayout : IAsyncDisposable
         NavigationManager.NavigateTo(ApplicationConstants.Routes.Login, true);
     }
 
+    private async Task HandlePermissionUpdated(string roleName)
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (!authState.User.IsInRole(roleName)) return;
+        Snackbar.Add($"Your role {roleName} has been updated. You will be logged out.", Severity.Warning);
+        await AuthStateProvider.NotifyLogoutAsync();
+        NavigationManager.NavigateTo(ApplicationConstants.Routes.Login, true);
+    }
     public async ValueTask DisposeAsync()
     {
         NavigationManager.LocationChanged -= HandleLocationChanged;

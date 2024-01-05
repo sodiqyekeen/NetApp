@@ -5,9 +5,9 @@
     <MudDialogProvider Position="DialogPosition.Center" FullWidth="true" MaxWidth="MaxWidth.Small" />
     <MudSnackbarProvider />
     <MudLayout>
+        <NetAppThemeProvider />
         <Router AppAssembly="@typeof(Program).Assembly">
             <Found Context="routeData">
-                <NetAppThemeProvider />
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
                         <RedirectToLogin />
@@ -15,9 +15,21 @@
                 </AuthorizeRouteView>
             </Found>
             <NotFound>
-                <PageTitle>Not found</PageTitle>
-                <LayoutView Layout="@typeof(MainLayout)">
-                    <p>Sorry, there's nothing at this address.</p>
+                <LayoutView Layout="@typeof(ErrorLayout)">
+                    <MudPaper Elevation="12" Class="d-flex flex-column justify-center pa-8">
+                        <MudText Typo="Typo.h1" Align="Align.Center" GutterBottom="true">Oops!</MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Center">
+                            We can't seem to find the page you're looking for.
+                        </MudText>
+                        <h1
+                            style="font-size:clamp(5rem,40vmin,15rem); color:var(--mud-palette-background);  letter-spacing: 1rem;">
+                            404
+                        </h1>
+                        <MudButton Variant="Variant.Filled" Href="/" Color="Color.Primary" Class="mt-4"
+                            FullWidth="false">
+                            Go to home page
+                        </MudButton>
+                    </MudPaper>
                 </LayoutView>
             </NotFound>
         </Router>

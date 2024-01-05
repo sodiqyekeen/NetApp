@@ -1,5 +1,3 @@
-
-
 .mud-nav-item,
 .mud-nav-group {
     color: #9899ac;
@@ -20,15 +18,15 @@
     background-color: #1b1b28;
 }
 
-.mud-nav-item > .mud-nav-link.active > .mud-nav-link-icon {
+.mud-nav-item>.mud-nav-link.active>.mud-nav-link-icon {
     color: var(--mud-palette-primary);
 }
 
-.mud-nav-item > .mud-nav-link.active > .mud-nav-link-text {
+.mud-nav-item>.mud-nav-link.active>.mud-nav-link-text {
     color: #fff;
 }
 
-.mud-breadcrumb-item.mud-disabled > a {
+.mud-breadcrumb-item.mud-disabled>a {
     color: var(--mud-palette-text-primary);
 }
 
@@ -36,11 +34,12 @@
     border-color: var(--mud-palette-grey-dark) !important;
 }
 
-.mud-simple-table table * tr>td, .mud-simple-table table * tr th{
+.mud-simple-table table * tr>td,
+.mud-simple-table table * tr th {
     border: none;
 }
 
-.mud-simple-table table * tr>td:first-child{
+.mud-simple-table table * tr>td:first-child {
     color: var(--mud-palette-text-secondary);
 }
 
@@ -77,15 +76,15 @@
     animation: loading_713 3.5s ease both infinite;
 }
 
-    .load::before {
-        position: absolute;
-        content: "";
-        width: 100%;
-        height: 100%;
-        background-color: #9899ac;
-        border-radius: inherit;
-        animation: loading2_713 3.5s ease both infinite;
-    }
+.load::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: #9899ac;
+    border-radius: inherit;
+    animation: loading2_713 3.5s ease both infinite;
+}
 
 @keyframes text_713 {
     0% {
@@ -178,7 +177,7 @@
 }
 
 .mud-input-label-outlined {
-    transform: translate(14px,20px) scale(1);
+    transform: translate(14px, 20px) scale(1);
     pointer-events: none;
     background-color: transparent;
     padding: 0 5px !important;
@@ -204,6 +203,7 @@
 }
 
 @media (min-width:1200px) {
+
     .h1,
     h1 {
         font-size: 1.75rem
@@ -225,8 +225,8 @@
     background-color: transparent;
 }
 
-.mud-shrink ~ label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined,
-.mud-input:focus-within ~ label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined {
+.mud-shrink~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined,
+.mud-input:focus-within~label.mud-input-label.mud-input-label-inputcontrol.mud-input-label-outlined {
     background-color: var(--mud-palette-surface);
 }
 

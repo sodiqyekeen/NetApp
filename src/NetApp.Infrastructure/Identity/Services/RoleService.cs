@@ -153,6 +153,7 @@ IHubContext<NetAppHub> hubContext)
         {
             await roleManager.AddClaimAsync(role, new Claim(SharedConstants.CustomClaimTypes.Permission, permission));
         }
+        await hubContext.Clients.All.SendAsync(SharedConstants.SignalR.OnPermissionUpdated, role.Name);
         return Response.Success(localizer["Permissions updated successfully."]);
     }
 

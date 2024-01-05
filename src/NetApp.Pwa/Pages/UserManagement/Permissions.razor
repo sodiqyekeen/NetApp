@@ -4,7 +4,9 @@
 @inject IDispatcher Dispatcher
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
+<NavigationLock ConfirmExternalNavigation="true"     OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 @if (permissionResponse is not null)
 {
     <MudTabs Elevation="25" Rounded="true" Centered="true" ApplyEffectsToContainer="true" AlwaysShowScrollButtons="true">
@@ -100,6 +102,20 @@
         else
         {
             Snackbar.Add(response.Message, Severity.Error);
+        }
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(ConfirmationDialog.ContentText), "Changes you made will not be saved.");
+        parameters.Add(nameof(ConfirmationDialog.ConfirmButtonText), "Leave");
+        parameters.Add(nameof(ConfirmationDialog.Title), "Are you sure you want to leave this page?");
+        var dialog = DialogService.Show<ConfirmationDialog>("Confirmation", parameters);
+        var result = await dialog.Result;
+        if (result.Cancelled)
+        {
+            context.PreventNavigation();
         }
     }
 }

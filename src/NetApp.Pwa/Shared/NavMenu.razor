@@ -3,8 +3,6 @@
         <MudNavLink Href="@ApplicationConstants.Routes.Dashboard" Icon="@Icons.Material.Outlined.Dashboard"
             Match="NavLinkMatch.All">Dashboard</MudNavLink>
         <MudNavLink Href="counter" Icon="@Icons.Material.Outlined.Add">Counter</MudNavLink>
-        <MudNavLink Href="fetchdata" Icon="@Icons.Material.Outlined.List">Fetch Data</MudNavLink>
-
         <MudNavGroup Title="User Management" Icon="@Icons.Material.Filled.AdminPanelSettings">
             @if (context.CanViewUsers())
             {
@@ -18,6 +16,5 @@
             }
 
         </MudNavGroup>
-        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
     </MudNavMenu>
 </AuthorizeView>

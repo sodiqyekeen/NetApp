@@ -8,6 +8,7 @@ public static class SharedConstants
         public const string OnRoleDeleted = "RoleDeleted";
         public const string OnConnected = "Connected";
         public const string NotifyRolesUpdated = "NotifyRolesUpdated";
+        public const string OnPermissionUpdated = "PermissionUpdated";
     }
 
     public static class CustomClaimTypes

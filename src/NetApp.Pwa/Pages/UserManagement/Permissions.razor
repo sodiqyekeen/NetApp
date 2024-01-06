@@ -6,7 +6,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
-<NavigationLock ConfirmExternalNavigation="true"     OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+<NavigationLock ConfirmExternalNavigation="true" OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 @if (permissionResponse is not null)
 {
     <MudTabs Elevation="25" Rounded="true" Centered="true" ApplyEffectsToContainer="true" AlwaysShowScrollButtons="true">
@@ -20,7 +20,6 @@
                 <MudTable Hover=" true" Elevation="25" Items="@module.Permissions.OrderBy(p => p.Name)">
                     <ToolBarContent>
                         <MudHidden Breakpoint="Breakpoint.Xs">
-
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
                                 ButtonType="ButtonType.Submit" OnClick="UpdatePermissionsAsync">Update Permissions</MudButton>
 
@@ -113,7 +112,7 @@
         parameters.Add(nameof(ConfirmationDialog.Title), "Are you sure you want to leave this page?");
         var dialog = DialogService.Show<ConfirmationDialog>("Confirmation", parameters);
         var result = await dialog.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             context.PreventNavigation();
         }

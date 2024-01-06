@@ -17,13 +17,13 @@
       "type": "parameter",
       "description": "The traget framework for the Application",
       "datatype": "choice",
-      "defaultValue": "net7.0",
+      "defaultValue": "net8.0",
       "choices": [
         {
-          "choice": "net6.0"
+          "choice": "net7.0"
         },
         {
-          "choice": "net7.0"
+          "choice": "net8.0"
         }
       ]
     }
@@ -36,7 +36,11 @@
         ".template.config/**/*",
         "**/*.filelist",
         "**/*.user",
-        "**/*.lock.json"
+        "**/*.lock.json",
+        "**/NetApp.UI.Components/**",
+        "**/NetApp.UI.Pwa/**",
+        "**/NetApp.UI/**",
+        "**/*.db"
       ]
     }
   ]

@@ -34,6 +34,9 @@ public static class Permissions
 
         [Description("Can export users.")]
         public const string Export = "Permissions.User.Export";
+
+        [Description("Can view user roles.")]
+        public const string ViewRoles = "Permissions.User.ViewRoles";
     }
 
     [DisplayName("Role"), Description("Role Permissions")]

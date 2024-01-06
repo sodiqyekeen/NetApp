@@ -17,31 +17,31 @@ internal static class RoleEndpoints
         .Produces<IResponse<RoleResponse>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", async (RoleRequest request, IRoleService roleService) =>
+        group.MapPost("/", [Authorize(Policy = Permissions.Role.Create)] async (RoleRequest request, IRoleService roleService) =>
         Results.Ok(await roleService.SaveAsync(request)))
         .Produces<IResponse<string>>(StatusCodes.Status200OK);
 
-        group.MapPut("/{id}", async (string id, RoleRequest request, IRoleService roleService) =>
+        group.MapPut("/{id}", [Authorize(Policy = Permissions.Role.Edit)] async (string id, RoleRequest request, IRoleService roleService) =>
         Results.Ok(await roleService.SaveAsync(request)))
         .Produces<IResponse<string>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
-        group.MapDelete("/{id}", async (string id, IRoleService roleService) =>
+        group.MapDelete("/{id}", [Authorize(Policy = Permissions.Role.Delete)] async (string id, IRoleService roleService) =>
         Results.Ok(await roleService.DeleteAsync(id)))
         .Produces<IResponse>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
-        group.MapGet("/{id}/permissions", async (string id, IRoleService roleService) =>
+        group.MapGet("/{id}/permissions", [Authorize(Policy = Permissions.Permission.View)] async (string id, IRoleService roleService) =>
         Results.Ok(await roleService.GetAllPermissionsAsync(id)))
         .Produces<IResponse<PermissionResponse>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPut("/{id}/permissions", async (string id, PermissionRequest request, IRoleService roleService) =>
+        group.MapPut("/{id}/permissions", [Authorize(Policy = Permissions.Role.ManageRolePermission)] async (string id, PermissionRequest request, IRoleService roleService) =>
         Results.Ok(await roleService.UpdatePermissionsAsync(request)))
         .Produces<IResponse>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
-        group.MapGet("/permissions", async (IRoleService roleService, CancellationToken cancellationToken) =>
+        group.MapGet("/permissions", [Authorize] async (IRoleService roleService, CancellationToken cancellationToken) =>
         Results.Ok(await roleService.GetAllRolesWithPermissionsAsync(cancellationToken)))
         .Produces<IResponse<IEnumerable<RoleWithPermissionsResponse>>>(StatusCodes.Status200OK);
 

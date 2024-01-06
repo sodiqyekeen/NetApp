@@ -16,19 +16,19 @@ internal static class IdentityEndpoints
              Results.Ok(await identityService.RefreshTokenAsync(request, GetIPAddress(context))))
              .Produces<IResponse<AuthenticationResponse>>(StatusCodes.Status200OK);
 
-        group.MapGet("/users", [Authorize] async (IIdentityService identityService, [AsParameters] PagingOptions pagingOptions, CancellationToken cancellationToken) =>
+        group.MapGet("/users", [Authorize(Policy = Permissions.User.View)] async (IIdentityService identityService, [AsParameters] PagingOptions pagingOptions, CancellationToken cancellationToken) =>
             Results.Ok(await identityService.GetUsersAsync(pagingOptions, cancellationToken)))
             .Produces<IResponse<IEnumerable<UserDto>>>(StatusCodes.Status200OK);
 
-        group.MapGet("/users/{id}", [Authorize(Policy = Permissions.User.View)] async (IIdentityService identityService, string id) =>
+        group.MapGet("/users/{id}", [Authorize] async (IIdentityService identityService, string id) =>
             Results.Ok(await identityService.GetUser(id)))
                 .Produces<IResponse<UserDto>>(StatusCodes.Status200OK);
 
-        group.MapPut("/users/{id}", [Authorize] async (EditUserRequest request, string id, IIdentityService identityService) =>
+        group.MapPut("/users/{id}", [Authorize(Policy = Permissions.User.Edit)] async (EditUserRequest request, string id, IIdentityService identityService) =>
             Results.Ok(await identityService.UpdateUserAsync(id, request)))
             .Produces<IResponse>(StatusCodes.Status200OK);
 
-        group.MapPost("/users", [Authorize] async (RegisterRequest request, string origin, IIdentityService identityService) =>
+        group.MapPost("/users", [Authorize(Policy = Permissions.User.Create)] async (RegisterRequest request, string origin, IIdentityService identityService) =>
             Results.Ok(await identityService.RegisterAsync(request, origin)))
             .Produces<IResponse<string>>(StatusCodes.Status200OK);
 
@@ -36,12 +36,11 @@ internal static class IdentityEndpoints
             Results.Ok(await identityService.ConfirmEmailAsync(userId, code)))
             .Produces<IResponse<string>>(StatusCodes.Status200OK);
 
-        group.MapPost("/users/{userId}/resend-confirmation-email", [Authorize] async (ConfirmationMailRequest request, string userId, HttpContext context, IIdentityService identityService) =>
+        group.MapPost("/users/{userId}/resend-confirmation-email", [Authorize(Policy = Permissions.User.ResendConfirmation)] async (ConfirmationMailRequest request, string userId, HttpContext context, IIdentityService identityService) =>
         {
             await identityService.ResendConfirmationMailAsync(request, GetIPAddress(context));
             return Results.NoContent();
-        })
-          .Produces(StatusCodes.Status204NoContent);
+        }).Produces(StatusCodes.Status204NoContent);
 
         group.MapPost("/users/forgot-password", async (ForgotPasswordRequest request, IIdentityService identityService) =>
         {
@@ -57,15 +56,15 @@ internal static class IdentityEndpoints
              Results.Ok(await identityService.UpdatePasswordAsync(request)))
              .Produces<IResponse>(StatusCodes.Status200OK);
 
-        group.MapDelete("/users/{userId}", [Authorize] async (string userId, IIdentityService identityService) =>
+        group.MapDelete("/users/{userId}", [Authorize(Policy = Permissions.User.Delete)] async (string userId, IIdentityService identityService) =>
             Results.Ok(await identityService.DeleteUserAsync(userId)))
             .Produces<IResponse>(StatusCodes.Status200OK);
 
-        group.MapGet("users/{userId}/roles", [Authorize] async (IIdentityService identityService, string userId, CancellationToken cancellationToken) =>
+        group.MapGet("users/{userId}/roles", [Authorize(Policy = Permissions.User.ViewRoles)] async (IIdentityService identityService, string userId, CancellationToken cancellationToken) =>
             Results.Ok(await identityService.GetRolesAsync(userId)))
             .Produces<IResponse<UserRolesResponse>>(StatusCodes.Status200OK);
 
-        group.MapPut("users/{userId}/roles", [Authorize] async (UpdateUserRoleRequest request, string userId, IIdentityService identityService) =>
+        group.MapPut("users/{userId}/roles", [Authorize(Policy = Permissions.User.ManageRole)] async (UpdateUserRoleRequest request, string userId, IIdentityService identityService) =>
             Results.Ok(await identityService.UpdateUserRoleAsync(userId, request)))
             .Produces<IResponse>(StatusCodes.Status200OK);
 

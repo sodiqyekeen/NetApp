@@ -9,5 +9,4 @@ public static class CollectionExtensions
         var isSubset = !subCollection.Except(mainCollection).Any();
         return isSubset;
     }
-
 }
